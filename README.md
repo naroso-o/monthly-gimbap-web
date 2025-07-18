@@ -1,5 +1,7 @@
 # 🍙 코드 김밥 (Code Kimbap)
 
+<img src="public/assets/main.png"  width="300" height="480"/>
+
 블로그 스터디 모임을 위한 체크리스트 관리 웹 애플리케이션
 
 ## 📋 프로젝트 개요
