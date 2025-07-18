@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { GimbapIcon } from "@/components/GimbapIcon";
 import { Mail, Lock } from "lucide-react";
 import type { LoginFormData } from "@/types";
-import { auth } from "../utils/supabase/authService";
+import { clientAuth } from "../utils/supabase/clientAuth";
 
 const LoginForm: React.FC = () => {
   const router = useRouter();
@@ -33,7 +33,7 @@ const LoginForm: React.FC = () => {
     setError("");
 
     try {
-      const { data, error: authError } = await auth.signIn(
+      const { data, error: authError } = await clientAuth.signIn(
         formData.email,
         formData.password
       );
