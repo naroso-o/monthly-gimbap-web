@@ -14,6 +14,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { GimbapIcon } from "@/components/GimbapIcon";
+import { DashboardCard } from "./DashboardCard";
 
 export function Dashboard() {
   const safeChecklistStatus = {
@@ -36,7 +37,7 @@ export function Dashboard() {
       className="min-h-screen bg-stone-50"
       style={{ backgroundColor: "#F7F5F3" }}
     >
-      <div className="relative z-10 p-4 max-w-md mx-auto">
+      <div className="relative z-10 p-4 max-w-md mx-auto lg:max-w-4xl">
         {/* 헤더 */}
         <div className="mb-6 pt-4">
           <div className="text-center space-y-2">
@@ -67,96 +68,51 @@ export function Dashboard() {
         </div>
 
         {/* 체크리스트 카드들 */}
-        <div className="space-y-4 mb-6">
+        <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
           {/* 블로그 글 작성 */}
-          <Card className="bg-white border border-stone-200 shadow-sm">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-3">
-                  <PenTool className="w-5 h-5 text-stone-600" />
-                  <span className="font-medium text-stone-700">
-                    블로그 글쓰기
-                  </span>
-                </div>
-                {safeChecklistStatus?.blog_completed ? (
-                  <CheckCircle2 className="w-5 h-5 text-amber-600" />
-                ) : (
-                  <Circle className="w-5 h-5 text-stone-400" />
-                )}
-              </div>
-              <p className="text-sm text-stone-500 mb-3">
-                이번 달 블로그 글 1개 작성하기
-              </p>
-              <Button
-                variant="primary"
-                size="sm"
-                className="w-full text-sm"
-                disabled={safeChecklistStatus?.blog_completed}
-              >
+          <DashboardCard
+            title="블로그 글쓰기"
+            icon={<PenTool className="w-5 h-5 text-stone-600" />}
+            description="이번 달 블로그 글 1개 작성하기"
+            isCompleted={safeChecklistStatus?.blog_completed}
+            button={
+              <Button variant="primary" size="sm" className="w-full text-sm">
                 {safeChecklistStatus?.blog_completed ? "완료!" : "글 작성 체크"}
               </Button>
-            </CardContent>
-          </Card>
+            }
+          />
 
-          {/* 수요일 출석 */}
-          <Card className="bg-white border border-stone-200 shadow-sm">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-3">
-                  <Calendar className="w-5 h-5 text-stone-600" />
-                  <span className="font-medium text-stone-700">
-                    수요일 출석
-                  </span>
-                </div>
-                {safeChecklistStatus?.attendance_completed ? (
-                  <CheckCircle2 className="w-5 h-5 text-amber-600" />
-                ) : (
-                  <Circle className="w-5 h-5 text-stone-400" />
-                )}
-              </div>
-              <p className="text-sm text-stone-500 mb-2">
-                월 2회 이상 수요일 출석
-              </p>
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs text-stone-500">진행률</span>
-                <span className="text-sm font-medium text-stone-700">
-                  {safeChecklistStatus?.wednesday_count}/2
-                </span>
-              </div>
+          <DashboardCard
+            title="수요일 출석"
+            icon={<Calendar className="w-5 h-5 text-stone-600" />}
+            description="월 2회 이상 수요일 출석"
+            isCompleted={safeChecklistStatus?.attendance_completed}
+            button={
               <Button variant="primary" size="sm" className="w-full text-sm">
-                출석 기록하기
+                {safeChecklistStatus?.blog_completed
+                  ? "완료!"
+                  : "출석 기록하기"}
               </Button>
-            </CardContent>
-          </Card>
+            }
+            progress={1}
+            targetProgress={2}
+          />
 
-          {/* 댓글 활동 */}
-          <Card className="bg-white border border-stone-200 shadow-sm">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-3">
-                  <MessageCircle className="w-5 h-5 text-stone-600" />
-                  <span className="font-medium text-stone-700">댓글 활동</span>
-                </div>
-                {safeChecklistStatus?.comments_completed ? (
-                  <CheckCircle2 className="w-5 h-5 text-amber-600" />
-                ) : (
-                  <Circle className="w-5 h-5 text-stone-400" />
-                )}
-              </div>
-              <p className="text-sm text-stone-500 mb-2">
-                월 4명 이상에게 댓글 달기
-              </p>
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs text-stone-500">진행률</span>
-                <span className="text-sm font-medium text-stone-700">
-                  {safeChecklistStatus?.comment_count}/4
-                </span>
-              </div>
+          <DashboardCard
+            title="댓글 활동"
+            icon={<MessageCircle className="w-5 h-5 text-stone-600" />}
+            description="월 4명 이상에게 댓글 달기"
+            isCompleted={safeChecklistStatus?.attendance_completed}
+            button={
               <Button variant="primary" size="sm" className="w-full text-sm">
-                댓글 체크하기
+                {safeChecklistStatus?.blog_completed
+                  ? "완료!"
+                  : "댓글 작성하기"}
               </Button>
-            </CardContent>
-          </Card>
+            }
+            progress={1}
+            targetProgress={4}
+          />
         </div>
 
         {/* 이번 달 활동 요약 */}
