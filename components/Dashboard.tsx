@@ -1,0 +1,234 @@
+"use client";
+
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Calendar,
+  MessageCircle,
+  PenTool,
+  Users,
+  CheckCircle2,
+  Circle,
+  Sparkles,
+} from "lucide-react";
+import { GimbapIcon } from "@/components/GimbapIcon";
+
+export function Dashboard() {
+  const safeChecklistStatus = {
+    blog_completed: false,
+    attendance_completed: false,
+    comments_completed: false,
+    wednesday_count: 0,
+    total_attendance: 0,
+    comment_count: 0,
+  };
+
+  const completedCount = [
+    safeChecklistStatus.blog_completed,
+    safeChecklistStatus.attendance_completed,
+    safeChecklistStatus.comments_completed,
+  ].filter(Boolean).length;
+
+  return (
+    <div
+      className="min-h-screen bg-stone-50"
+      style={{ backgroundColor: "#F7F5F3" }}
+    >
+      <div className="relative z-10 p-4 max-w-md mx-auto">
+        {/* 헤더 */}
+        <div className="mb-6 pt-4">
+          <div className="text-center space-y-2">
+            <div className="flex justify-center mb-4">
+              <GimbapIcon className="w-12 h-12" />
+            </div>
+            <h1
+              className="text-xl font-medium text-stone-700"
+              style={{ fontFamily: "Georgia, serif" }}
+            >
+              {/* {user?.name}님의 김밥일기 */}
+              님의 코드김밥
+            </h1>
+            {/* <p className="text-sm text-stone-500">{currentPeriod?.month}</p> */}
+          </div>
+        </div>
+
+        {/* 체크리스트 요약 */}
+        <div className="mb-6 text-center">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full border-2 border-stone-300 bg-white mb-4">
+            <span className="text-2xl font-light text-stone-600">
+              {completedCount}/3
+            </span>
+          </div>
+          <p className="text-sm text-stone-600 leading-relaxed">
+            이번 달 완료한 체크리스트
+          </p>
+        </div>
+
+        {/* 체크리스트 카드들 */}
+        <div className="space-y-4 mb-6">
+          {/* 블로그 글 작성 */}
+          <Card className="bg-white border border-stone-200 shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-3">
+                  <PenTool className="w-5 h-5 text-stone-600" />
+                  <span className="font-medium text-stone-700">
+                    블로그 글쓰기
+                  </span>
+                </div>
+                {safeChecklistStatus?.blog_completed ? (
+                  <CheckCircle2 className="w-5 h-5 text-amber-600" />
+                ) : (
+                  <Circle className="w-5 h-5 text-stone-400" />
+                )}
+              </div>
+              <p className="text-sm text-stone-500 mb-3">
+                이번 달 블로그 글 1개 작성하기
+              </p>
+              <Button
+                size="sm"
+                className="w-full bg-stone-700 hover:bg-stone-800 text-white text-sm"
+                disabled={safeChecklistStatus?.blog_completed}
+              >
+                {safeChecklistStatus?.blog_completed ? "완료!" : "글 작성 체크"}
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* 수요일 출석 */}
+          <Card className="bg-white border border-stone-200 shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-3">
+                  <Calendar className="w-5 h-5 text-stone-600" />
+                  <span className="font-medium text-stone-700">
+                    수요일 출석
+                  </span>
+                </div>
+                {safeChecklistStatus?.attendance_completed ? (
+                  <CheckCircle2 className="w-5 h-5 text-amber-600" />
+                ) : (
+                  <Circle className="w-5 h-5 text-stone-400" />
+                )}
+              </div>
+              <p className="text-sm text-stone-500 mb-2">
+                월 2회 이상 수요일 출석
+              </p>
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs text-stone-500">진행률</span>
+                <span className="text-sm font-medium text-stone-700">
+                  {safeChecklistStatus?.wednesday_count}/2
+                </span>
+              </div>
+              <Button
+                size="sm"
+                className="w-full bg-stone-700 hover:bg-stone-800 text-white text-sm"
+              >
+                출석 기록하기
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* 댓글 활동 */}
+          <Card className="bg-white border border-stone-200 shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-3">
+                  <MessageCircle className="w-5 h-5 text-stone-600" />
+                  <span className="font-medium text-stone-700">댓글 활동</span>
+                </div>
+                {safeChecklistStatus?.comments_completed ? (
+                  <CheckCircle2 className="w-5 h-5 text-amber-600" />
+                ) : (
+                  <Circle className="w-5 h-5 text-stone-400" />
+                )}
+              </div>
+              <p className="text-sm text-stone-500 mb-2">
+                월 4명 이상에게 댓글 달기
+              </p>
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs text-stone-500">진행률</span>
+                <span className="text-sm font-medium text-stone-700">
+                  {safeChecklistStatus?.comment_count}/4
+                </span>
+              </div>
+              <Button
+                size="sm"
+                className="w-full bg-stone-700 hover:bg-stone-800 text-white text-sm"
+              >
+                댓글 체크하기
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* 이번 달 활동 요약 */}
+        <Card className="bg-white border border-stone-200 shadow-sm mb-6">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-stone-700 text-base">
+              <Sparkles className="w-4 h-4 text-amber-600" />
+              이번 달 활동
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-stone-600">총 출석</span>
+                <Badge
+                  variant="outline"
+                  className="text-xs border-stone-300 text-stone-600"
+                >
+                  {safeChecklistStatus?.total_attendance}회
+                </Badge>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-stone-600">수요일 출석</span>
+                <Badge
+                  variant="outline"
+                  className="text-xs border-stone-300 text-stone-600"
+                >
+                  {safeChecklistStatus?.wednesday_count}회
+                </Badge>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-stone-600">댓글 활동</span>
+                <Badge
+                  variant="outline"
+                  className="text-xs border-stone-300 text-stone-600"
+                >
+                  {safeChecklistStatus?.comment_count}명
+                </Badge>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* 하단 네비게이션 */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200">
+          <div className="max-w-md mx-auto px-4 py-3">
+            <div className="flex justify-around items-center">
+              <button className="flex flex-col items-center gap-1">
+                <div className="w-6 h-6 rounded-full bg-stone-700"></div>
+                <span className="text-xs text-stone-600">홈</span>
+              </button>
+              <button className="flex flex-col items-center gap-1">
+                <Calendar className="w-5 h-5 text-stone-400" />
+                <span className="text-xs text-stone-400">출석</span>
+              </button>
+              <button className="flex flex-col items-center gap-1">
+                <MessageCircle className="w-5 h-5 text-stone-400" />
+                <span className="text-xs text-stone-400">댓글</span>
+              </button>
+              <button className="flex flex-col items-center gap-1">
+                <Users className="w-5 h-5 text-stone-400" />
+                <span className="text-xs text-stone-400">멤버</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
