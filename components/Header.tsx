@@ -9,9 +9,11 @@ export const Header = () => {
   };
 
   return (
-    <div className=" w-full h-16">
+    <div className="w-full h-16 px-4 py-2">
       <div className="flex justify-end items-center">
-        <Button onClick={handleSignOut}>Sign Out</Button>
+        <Button onClick={handleSignOut} variant="secondary">
+          Sign Out
+        </Button>
       </div>
     </div>
   );

@@ -88,8 +88,9 @@ export function Dashboard() {
                 이번 달 블로그 글 1개 작성하기
               </p>
               <Button
+                variant="primary"
                 size="sm"
-                className="w-full bg-stone-700 hover:bg-stone-800 text-white text-sm"
+                className="w-full text-sm"
                 disabled={safeChecklistStatus?.blog_completed}
               >
                 {safeChecklistStatus?.blog_completed ? "완료!" : "글 작성 체크"}
@@ -122,10 +123,7 @@ export function Dashboard() {
                   {safeChecklistStatus?.wednesday_count}/2
                 </span>
               </div>
-              <Button
-                size="sm"
-                className="w-full bg-stone-700 hover:bg-stone-800 text-white text-sm"
-              >
+              <Button variant="primary" size="sm" className="w-full text-sm">
                 출석 기록하기
               </Button>
             </CardContent>
@@ -154,10 +152,7 @@ export function Dashboard() {
                   {safeChecklistStatus?.comment_count}/4
                 </span>
               </div>
-              <Button
-                size="sm"
-                className="w-full bg-stone-700 hover:bg-stone-800 text-white text-sm"
-              >
+              <Button variant="primary" size="sm" className="w-full text-sm">
                 댓글 체크하기
               </Button>
             </CardContent>
