@@ -6,7 +6,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 export const ReactQueryClient = ({ children }: { children: React.ReactNode }) => {
   const queryClient = createQueryClient();
-  const isServer = typeof window === "undefined";
+  const isServer = process.env.NODE_ENV === "production";
 
   return (
     <QueryClientProvider client={queryClient}>
