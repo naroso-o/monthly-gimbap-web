@@ -11,22 +11,16 @@ import {
   Sparkles,
 } from "lucide-react";
 import { DashboardCard } from "./DashboardCard";
+import { ChecklistData } from "../types";
+import { useEffect, useState } from "react";
+import { useUserQuery } from "../remote/users";
 
 export function Dashboard() {
-  const safeChecklistStatus = {
-    blog_completed: false,
-    attendance_completed: false,
-    comments_completed: false,
-    wednesday_count: 0,
-    total_attendance: 0,
-    comment_count: 0,
-  };
-
-  const completedCount = [
-    safeChecklistStatus.blog_completed,
-    safeChecklistStatus.attendance_completed,
-    safeChecklistStatus.comments_completed,
-  ].filter(Boolean).length;
+  // const completedCount = [
+  //   checklistData.blogPost.isCompleted,
+  //   checklistData.attendance.isCompleted,
+  //   checklistData.comments.isCompleted,
+  // ].filter(Boolean).length;
 
   return (
     <>
@@ -49,10 +43,10 @@ export function Dashboard() {
           title="블로그 글쓰기"
           icon={<PenTool className="w-5 h-5 text-stone-600" />}
           description="이번 달 블로그 글 1개 작성하기"
-          isCompleted={safeChecklistStatus?.blog_completed}
+          isCompleted={checklistData.blogPost.isCompleted}
           button={
             <Button variant="primary" size="sm" className="w-full text-sm">
-              {safeChecklistStatus?.blog_completed ? "완료!" : "글 작성 체크"}
+              {checklistData.blogPost.isCompleted ? "완료!" : "글 작성 체크"}
             </Button>
           }
         />
@@ -60,29 +54,25 @@ export function Dashboard() {
         <DashboardCard
           title="수요일 출석"
           icon={<Calendar className="w-5 h-5 text-stone-600" />}
-          description="월 2회 이상 수요일 출석"
-          isCompleted={safeChecklistStatus?.attendance_completed}
+          description={`월 2회 이상 수요일 출석 (${checklistData.attendance.wednesdayCount}/2)`}
+          isCompleted={checklistData.attendance.isCompleted}
           button={
             <Button variant="primary" size="sm" className="w-full text-sm">
-              {safeChecklistStatus?.blog_completed ? "완료!" : "출석 기록하기"}
+              {checklistData.attendance.isCompleted ? "완료!" : "출석 기록하기"}
             </Button>
           }
-          progress={1}
-          targetProgress={2}
         />
 
         <DashboardCard
           title="댓글 활동"
           icon={<MessageCircle className="w-5 h-5 text-stone-600" />}
-          description="월 4명 이상에게 댓글 달기"
-          isCompleted={safeChecklistStatus?.attendance_completed}
+          description={`월 4명 이상에게 댓글 달기 (${checklistData.comments.completedCount}/4)`}
+          isCompleted={checklistData.comments.isCompleted}
           button={
             <Button variant="primary" size="sm" className="w-full text-sm">
-              {safeChecklistStatus?.blog_completed ? "완료!" : "댓글 작성하기"}
+              {checklistData.comments.isCompleted ? "완료!" : "댓글 작성하기"}
             </Button>
           }
-          progress={1}
-          targetProgress={4}
         />
       </div>
 
@@ -102,7 +92,7 @@ export function Dashboard() {
                 variant="outline"
                 className="text-xs border-stone-300 text-stone-600"
               >
-                {safeChecklistStatus?.total_attendance}회
+                {checklistData.attendance.totalAttendanceCount}회
               </Badge>
             </div>
             <div className="flex justify-between items-center">
@@ -111,7 +101,7 @@ export function Dashboard() {
                 variant="outline"
                 className="text-xs border-stone-300 text-stone-600"
               >
-                {safeChecklistStatus?.wednesday_count}회
+                {checklistData.attendance.wednesdayCount}회
               </Badge>
             </div>
             <div className="flex justify-between items-center">
@@ -120,7 +110,7 @@ export function Dashboard() {
                 variant="outline"
                 className="text-xs border-stone-300 text-stone-600"
               >
-                {safeChecklistStatus?.comment_count}명
+                {checklistData.comments.completedCount}명
               </Badge>
             </div>
           </div>

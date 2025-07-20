@@ -1,27 +1,37 @@
 "use client";
 
-import { User } from "@/types";
 import { GimbapIcon } from "./GimbapIcon";
-import { useState } from "react";
-import { clientAuth } from "@/utils/supabase/clientAuth";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import { useUser } from "../hooks/useUser";
+import { useCurrentPeriod } from "../remote/period";
 
-export const DashboardHeader = ({ user }: { user: User | null }) => {
-  const [isEditingName, setIsEditingName] = useState(false);
-  const [tempName, setTempName] = useState(user?.name || "");
+export const DashboardHeader = () => {
+  const {
+    user,
+    isLoading,
+    isUpdatePending,
+    isEditingName,
+    tempName,
+    setTempName,
+    handleEditClick,
+    handleUpdateName,
+    handleCancel,
+  } = useUser();
+  const { data: currentPeriod } = useCurrentPeriod();
 
-  const handleUpdateName = async () => {
-    if (!tempName.trim()) return;
-    
-    try {
-      await clientAuth.updateUserMetadata({ name: tempName });
-      setIsEditingName(false);
-      window.location.reload(); // 간단한 새로고침
-    } catch (error) {
-      console.error("Name update failed:", error);
-    }
-  };
+  if (isLoading) {
+    return (
+      <div className="mb-6 pt-4">
+        <div className="text-center space-y-2">
+          <div className="flex justify-center mb-4">
+            <GimbapIcon className="w-12 h-12" />
+          </div>
+          <div className="h-6 bg-gray-200 rounded animate-pulse w-48 mx-auto"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mb-6 pt-4">
@@ -42,22 +52,32 @@ export const DashboardHeader = ({ user }: { user: User | null }) => {
                     onChange={(e) => setTempName(e.target.value)}
                     placeholder="이름을 입력하세요"
                     className="w-32 text-center"
+                    disabled={isUpdatePending}
                   />
-                  <Button size="sm" onClick={handleUpdateName}>
-                    저장
+                  <Button
+                    size="sm"
+                    onClick={handleUpdateName}
+                    disabled={isUpdatePending}
+                  >
+                    {isUpdatePending ? "저장중..." : "저장"}
                   </Button>
-                  <Button size="sm" variant="outline" onClick={() => setIsEditingName(false)}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleCancel}
+                    disabled={isUpdatePending}
+                  >
                     취소
                   </Button>
                 </div>
               ) : (
                 <div className="flex items-center justify-center gap-2">
                   <span>{user.name}님의 김밥일기</span>
-                  {user.name === user.email?.split('@')[0] && (
-                    <Button 
-                      size="sm" 
-                      variant="ghost" 
-                      onClick={() => setIsEditingName(true)}
+                  {user.name === user.email?.split("@")[0] && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={handleEditClick}
                       className="text-xs"
                     >
                       이름 설정
@@ -70,7 +90,9 @@ export const DashboardHeader = ({ user }: { user: User | null }) => {
             "게스트님의 김밥일기"
           )}
         </h1>
-        {/* <p className="text-sm text-stone-500">{currentPeriod?.month}</p> */}
+        <p className="text-sm text-stone-600">
+          {currentPeriod?.start_date} ~ {currentPeriod?.end_date}
+        </p>
       </div>
     </div>
   );

@@ -1,17 +1,16 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { GimbapIcon } from "@/components/GimbapIcon";
 import { Mail, Lock } from "lucide-react";
 import type { LoginFormData } from "@/types";
-import { clientAuth } from "../utils/supabase/clientAuth";
+import { createClient } from "@/utils/supabase/client";
 
 const LoginForm: React.FC = () => {
-  const router = useRouter();
+  const supabase = createClient();
   const [formData, setFormData] = useState<LoginFormData>({
     email: "",
     password: "",
@@ -33,10 +32,10 @@ const LoginForm: React.FC = () => {
     setError("");
 
     try {
-      const { data, error: authError } = await clientAuth.signIn(
-        formData.email,
-        formData.password
-      );
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+      });
 
       if (authError) {
         // Supabase에서 반환된 에러 메시지를 사용자 친화적으로 변경
@@ -52,9 +51,6 @@ const LoginForm: React.FC = () => {
           setError(authError.message || "로그인 중 오류가 발생했습니다.");
         }
       } else if (data.user) {
-        // 로그인 성공 시 잠시 대기 후 리다이렉트
-        console.log("Login successful, redirecting...");
-
         // 쿠키가 설정될 시간을 주기 위해 약간의 지연
         setTimeout(() => {
           window.location.href = "/";
