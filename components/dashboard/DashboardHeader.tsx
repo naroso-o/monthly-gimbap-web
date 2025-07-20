@@ -1,10 +1,10 @@
 "use client";
 
-import { GimbapIcon } from "./icon/GimbapIcon";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { useUser } from "../hooks/useUser";
-import { useCurrentPeriodQuery } from "../remote/period";
+import { GimbapIcon } from "../icon/GimbapIcon";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { useUser } from "../../hooks/useUser";
+import { useCurrentPeriodQuery } from "../../remote/period";
 
 export const DashboardHeader = () => {
   const {

@@ -3,7 +3,7 @@ import {
   Card,
   CardContent,
   CardFooter,
-} from "./ui/card";
+} from "../ui/card";
 
 interface DashboardCardProps {
   title: string;

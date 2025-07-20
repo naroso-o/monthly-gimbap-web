@@ -1,7 +1,7 @@
 "use client";
 
 import { ExternalLink, MessageSquare, Users, FileText } from "lucide-react";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 
 const quickMenuItems = [
   {

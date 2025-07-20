@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { Header } from "@/components/layout/Header";
 import { BottomNavigation } from "@/components/layout/BottomNavigation";
-import { DashboardSection } from "../components/DashboardSection";
+import { DashboardSection } from "../components/dashboard/DashboardSection";
 
 export const metadata: Metadata = {
   title: "코드 김밥",
