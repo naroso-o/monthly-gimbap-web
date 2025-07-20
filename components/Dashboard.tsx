@@ -66,7 +66,7 @@ export function Dashboard({ periodId }: { periodId: string }) {
           description={`월 2회 이상 수요일 출석 (${
             attendanceChecklist?.wednesday_count || 0
           }/2)`}
-          isCompleted={attendanceChecklist?.is_completed}
+          isCompleted={attendanceChecklist?.is_completed || false}
           button={
             <Button
               variant="primary"

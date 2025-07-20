@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <div>
+    <div className="pb-[var(--bottom-menu-height)]">
       <Header />
       <DashboardSection />
       <BottomNavigation />

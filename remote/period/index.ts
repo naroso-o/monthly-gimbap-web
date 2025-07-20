@@ -9,8 +9,13 @@ export interface MonthlyPeriod {
   created_at: string;
 }
 
-export const useCurrentPeriodQuery = (year: number, month: number) => {
+export const useCurrentPeriodQuery = () => {
   const supabase = createClient();
+
+  // TODO: zustand
+  const currentDate = new Date();
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth() + 1;
 
   const { queryKey } = queryKeys.period.current(year, month);
 

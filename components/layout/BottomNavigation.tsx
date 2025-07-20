@@ -2,7 +2,7 @@ import { Calendar, MessageCircle, Users } from "lucide-react";
 
 export const BottomNavigation = () => {
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200">
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 h-[var(--bottom-menu-height)]">
       <div className="max-w-md mx-auto px-4 py-3">
         <div className="flex justify-around items-center">
           <button className="flex flex-col items-center gap-1">
