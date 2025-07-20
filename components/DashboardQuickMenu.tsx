@@ -1,14 +1,13 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
 import { ExternalLink, MessageSquare, Users, FileText } from "lucide-react";
 import { Button } from "./ui/button";
 
 const quickMenuItems = [
   {
-    name: "GitHub Issues",
+    name: "GitHub PR",
     icon: <FileText className="w-5 h-5" />,
-    url: "https://github.com/your-repo/issues",
+    url: "https://github.com/code-gimbap/weekly-post/pulls",
     color: "#8B7355",
   },
   {
@@ -20,13 +19,13 @@ const quickMenuItems = [
   {
     name: "Discord",
     icon: <MessageSquare className="w-5 h-5" />,
-    url: "https://discord.gg/your-server",
+    url: "https://discord.com/channels/1381837514473476196/1381981277195993218r",
     color: "#D4A574",
   },
   {
     name: "Notion",
     icon: <ExternalLink className="w-5 h-5" />,
-    url: "https://notion.so/your-workspace",
+    url: "https://www.notion.so/zenna9/234195618e9d803a8f82e6722c586ee4",
     color: "#E6B887",
   },
 ];
