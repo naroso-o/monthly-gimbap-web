@@ -4,10 +4,7 @@ import { createClient } from "@/utils/supabase/client";
 
 export const useBlogPostCheckQuery = (periodId: string) => {
   const supabase = createClient();
-  const currentDate = new Date();
-  const year = currentDate.getFullYear();
-  const month = currentDate.getMonth() + 1;
-  const { queryKey } = queryKeys.checklist.blogPost(year, month);
+  const { queryKey } = queryKeys.checklist.blogPost(periodId);
 
   return useQuery({
     queryKey,
@@ -33,10 +30,7 @@ export const useBlogPostCheckQuery = (periodId: string) => {
 
 export const useAttendanceCheckQuery = (periodId: string) => {
   const supabase = createClient();
-  const currentDate = new Date();
-  const year = currentDate.getFullYear();
-  const month = currentDate.getMonth() + 1;
-  const { queryKey } = queryKeys.checklist.attendance(year, month);
+  const { queryKey } = queryKeys.checklist.attendance(periodId);
 
   return useQuery({
     queryKey,
@@ -66,10 +60,7 @@ export const useAttendanceCheckQuery = (periodId: string) => {
 
 export const useCommentsCheckQuery = (periodId: string) => {
   const supabase = createClient();
-  const currentDate = new Date();
-  const year = currentDate.getFullYear();
-  const month = currentDate.getMonth() + 1;
-  const { queryKey } = queryKeys.checklist.comments(year, month);
+  const { queryKey } = queryKeys.checklist.comments(periodId);
 
   return useQuery({
     queryKey,
@@ -95,10 +86,7 @@ export const useCommentsCheckQuery = (periodId: string) => {
 
 export const useCommentsQuery = (commentId: string) => {
   const supabase = createClient();
-  const currentDate = new Date();
-  const year = currentDate.getFullYear();
-  const month = currentDate.getMonth() + 1;
-  const { queryKey } = queryKeys.checklist.comments(year, month);
+  const { queryKey } = queryKeys.checklist.comments(commentId);
 
   return useQuery({
     queryKey,

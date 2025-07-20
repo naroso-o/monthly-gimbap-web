@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import ChangePasswordForm from '@/components/ChangePasswordForm';
+import { ChangePasswordForm } from '@/components/auth/ChangePasswordForm';
 
 export const metadata: Metadata = {
   title: '비밀번호 변경 - 코드 김밥',

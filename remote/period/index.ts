@@ -7,7 +7,6 @@ export const useCurrentPeriodQuery = () => {
   const currentDate = new Date();
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth() + 1;
-  console.log(year, month);
 
   const { queryKey } = queryKeys.period.current(year, month);
 

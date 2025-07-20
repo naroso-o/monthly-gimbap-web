@@ -10,13 +10,9 @@ import {
   useCommentsQuery,
 } from "../remote/checklist";
 import { useCurrentPeriodQuery } from "../remote/period";
+import { toast } from "sonner";
 
 export function Dashboard() {
-  // const completedCount = [
-  //   checklistData.blogPost.isCompleted,
-  //   checklistData.attendance.isCompleted,
-  //   checklistData.comments.isCompleted,
-  // ].filter(Boolean).length;
 
   const { data: currentPeriod } = useCurrentPeriodQuery();
   const { data: blogPostChecklist } = useBlogPostCheckQuery(currentPeriod?.id);
@@ -30,6 +26,10 @@ export function Dashboard() {
     blogPostChecklist?.is_completed,
     attendanceChecklist?.is_completed,
   ].filter(Boolean).length;
+
+  const handleUnimplementedFunction = () => {
+    toast.info("아직 구현되지 않은 기능입니다.");
+  };
 
   return (
     <>
@@ -54,7 +54,7 @@ export function Dashboard() {
           description="이번 달 블로그 글 1개 작성하기"
           isCompleted={blogPostChecklist?.is_completed || false}
           button={
-            <Button variant="primary" size="sm" className="w-full text-sm">
+            <Button variant="primary" size="sm" className="w-full text-sm" onClick={handleUnimplementedFunction}>
               {blogPostChecklist?.is_completed ? "완료!" : "글 작성 체크"}
             </Button>
           }
@@ -68,7 +68,7 @@ export function Dashboard() {
           }/2)`}
           isCompleted={attendanceChecklist?.is_completed}
           button={
-            <Button variant="primary" size="sm" className="w-full text-sm">
+            <Button variant="primary" size="sm" className="w-full text-sm" onClick={handleUnimplementedFunction}>
               {attendanceChecklist?.is_completed ? "완료!" : "출석 기록하기"}
             </Button>
           }
@@ -80,7 +80,7 @@ export function Dashboard() {
           description={`월 4명 이상에게 댓글 달기 (${comments?.length || 0}/4)`}
           isCompleted={commentsCheck?.is_completed || false}
           button={
-            <Button variant="primary" size="sm" className="w-full text-sm">
+            <Button variant="primary" size="sm" className="w-full text-sm" onClick={handleUnimplementedFunction}>
               {commentsCheck?.is_completed ? "완료!" : "댓글 작성하기"}
             </Button>
           }

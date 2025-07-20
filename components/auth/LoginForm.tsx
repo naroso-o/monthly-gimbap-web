@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { GimbapIcon } from "@/components/GimbapIcon";
+import { GimbapIcon } from "@/components/icon/GimbapIcon";
 import { Mail, Lock } from "lucide-react";
 import type { LoginFormData } from "@/types";
 import { createClient } from "@/utils/supabase/client";

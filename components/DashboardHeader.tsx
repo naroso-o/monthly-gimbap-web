@@ -1,6 +1,6 @@
 "use client";
 
-import { GimbapIcon } from "./GimbapIcon";
+import { GimbapIcon } from "./icon/GimbapIcon";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { useUser } from "../hooks/useUser";
