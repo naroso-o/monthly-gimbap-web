@@ -5,6 +5,8 @@ import { createQueryClient } from "../utils/query-client";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { prefetchUser } from "@/remote/users/server-queries";
 import { prefetchPeriod } from "../remote/period/server-queries";
+import { Dashboard } from "../components/Dashboard";
+import { BottomNavigation } from "../components/BottomNavigation";
 
 export const metadata: Metadata = {
   title: "코드 김밥",
@@ -28,10 +30,11 @@ export default async function HomePage() {
         <HydrationBoundary state={dehydrate(queryClient)}>
           <div className="relative z-10 p-4 max-w-md mx-auto lg:max-w-4xl">
             <DashboardHeader />
-            {/* <Dashboard />  */}
+            <Dashboard /> 
           </div>
         </HydrationBoundary>
       </div>
+      <BottomNavigation />
     </div>
   );
 }

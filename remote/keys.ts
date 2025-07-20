@@ -11,4 +11,14 @@ const periodQueryKeys = createQueryKeys("period", {
   current: (year, month) => [year, month],
 });
 
-export const queryKeys = mergeQueryKeys(usersQueryKeys, periodQueryKeys);
+const checklistQueryKeys = createQueryKeys("checklist", {
+  blogPost: (year, month) => [year, month],
+  attendance: (year, month) => [year, month],
+  comments: (year, month) => [year, month],
+});
+
+export const queryKeys = mergeQueryKeys(
+  usersQueryKeys,
+  periodQueryKeys,
+  checklistQueryKeys
+);

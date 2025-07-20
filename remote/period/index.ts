@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "../keys";
 import { createClient } from "@/utils/supabase/client";
 
-export const useCurrentPeriod = () => {
+export const useCurrentPeriodQuery = () => {
   const supabase = createClient();
   const currentDate = new Date();
   const year = currentDate.getFullYear();

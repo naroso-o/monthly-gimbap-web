@@ -4,7 +4,7 @@ import { GimbapIcon } from "./GimbapIcon";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { useUser } from "../hooks/useUser";
-import { useCurrentPeriod } from "../remote/period";
+import { useCurrentPeriodQuery } from "../remote/period";
 
 export const DashboardHeader = () => {
   const {
@@ -18,7 +18,7 @@ export const DashboardHeader = () => {
     handleUpdateName,
     handleCancel,
   } = useUser();
-  const { data: currentPeriod } = useCurrentPeriod();
+  const { data: currentPeriod } = useCurrentPeriodQuery();
 
   if (isLoading) {
     return (
