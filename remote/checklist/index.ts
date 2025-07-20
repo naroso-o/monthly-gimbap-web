@@ -2,11 +2,22 @@ import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "../keys";
 import { createClient } from "@/utils/supabase/client";
 
+export interface ChecklistBlogPost {
+  id: string;
+  user_id: string;
+  period_id: string;
+  is_completed: boolean;
+  github_issue_url?: string;
+  completed_at?: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export const useBlogPostCheckQuery = (periodId: string) => {
   const supabase = createClient();
   const { queryKey } = queryKeys.checklist.blogPost(periodId);
 
-  return useQuery({
+  return useQuery<ChecklistBlogPost | null>({
     queryKey,
     queryFn: async () => {
       const { data, error } = await supabase
@@ -24,16 +35,29 @@ export const useBlogPostCheckQuery = (periodId: string) => {
           is_completed: false,
         };
       }
+
+      return data;
     },
     enabled: !!periodId,
   });
 };
 
+export interface ChecklistAttendance {
+  id: string;
+  user_id: string;
+  period_id: string;
+  is_completed: boolean;
+  wednesday_count: number;
+  total_attendance_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export const useAttendanceCheckQuery = (periodId: string) => {
   const supabase = createClient();
   const { queryKey } = queryKeys.checklist.attendance(periodId);
 
-  return useQuery({
+  return useQuery<ChecklistAttendance | null>({
     queryKey,
     queryFn: async () => {
       const { data, error } = await supabase
@@ -60,16 +84,25 @@ export const useAttendanceCheckQuery = (periodId: string) => {
   });
 };
 
+export interface ChecklistComment {
+  id: string;
+  user_id: string;
+  period_id: string;
+  is_completed: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export const useCommentsCheckQuery = (periodId: string) => {
   const supabase = createClient();
   const { queryKey } = queryKeys.checklist.comments(periodId);
 
-  return useQuery({
+  return useQuery<ChecklistComment | null>({
     queryKey,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("checklist_comments")
-        .select("is_completed")
+        .select("*")
         .eq("period_id", periodId)
         .maybeSingle();
 
@@ -82,16 +115,26 @@ export const useCommentsCheckQuery = (periodId: string) => {
           is_completed: false,
         };
       }
+
+      return data;
     },
     enabled: !!periodId,
   });
 };
 
+export interface CommentCheck {
+  id: string;
+  checklist_comment_id: string;
+  commenter_id: string;
+  target_user_id: string;
+  created_at: string;
+}
+
 export const useCommentsQuery = (commentId: string) => {
   const supabase = createClient();
   const { queryKey } = queryKeys.checklist.comments(commentId);
 
-  return useQuery({
+  return useQuery<CommentCheck[] | null>({
     queryKey,
     queryFn: async () => {
       const { data, error } = await supabase

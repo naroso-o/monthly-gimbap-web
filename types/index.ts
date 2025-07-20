@@ -1,20 +1,3 @@
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  is_admin: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface MonthlyPeriod {
-  id: string;
-  year: number;
-  month: number;
-  start_date: string;
-  end_date: string;
-  created_at: string;
-}
 
 export interface AttendanceRecord {
   id: string;
@@ -30,44 +13,6 @@ export interface AttendanceRecord {
   updated_at: string;
 }
 
-export interface ChecklistAttendance {
-  id: string;
-  user_id: string;
-  period_id: string;
-  is_completed: boolean;
-  wednesday_count: number;
-  total_attendance_count: number;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface ChecklistBlogPost {
-  id: string;
-  user_id: string;
-  period_id: string;
-  is_completed: boolean;
-  github_issue_url?: string;
-  completed_at?: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface ChecklistComment {
-  id: string;
-  user_id: string;
-  period_id: string;
-  is_completed: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface CommentCheck {
-  id: string;
-  checklist_comment_id: string;
-  commenter_id: string;
-  target_user_id: string;
-  created_at: string;
-}
 
 export interface Penalty {
   id: string;
@@ -82,67 +27,6 @@ export interface Penalty {
   updated_at: string;
 }
 
-export interface ChecklistData {
-  blogPost: {
-    isCompleted: boolean;
-    githubIssueUrl?: string;
-    completedAt?: string;
-  };
-  attendance: {
-    isCompleted: boolean;
-    wednesdayCount: number;
-    totalAttendanceCount: number;
-  };
-  comments: {
-    isCompleted: boolean;
-    completedCount: number; // join
-  };
-}
-
-export interface UserMonthlyStats {
-  user_id: string;
-  user_name: string;
-  year: number;
-  month: number;
-  total_hours: number;
-  total_attendance_days: number;
-  wednesday_count: number;
-  official_hours_count: number;
-}
-
-export interface UserWeekdayStats {
-  user_id: string;
-  user_name: string;
-  day_of_week: number;
-  day_name: string;
-  visit_count: number;
-  avg_hours: number;
-}
-
-export interface UserHourlyStats {
-  user_id: string;
-  user_name: string;
-  start_hour: number;
-  frequency: number;
-}
-
-// Supabase Auth 관련 타입
-export interface AuthUser {
-  id: string;
-  email?: string;
-  user_metadata?: {
-    name?: string;
-    [key: string]: string | boolean | number | undefined;
-  };
-}
-
-export interface AuthSession {
-  access_token: string;
-  refresh_token: string;
-  expires_in: number;
-  token_type: string;
-  user: AuthUser;
-}
 
 // API 응답 타입
 export interface ApiResponse<T> {
@@ -150,17 +34,6 @@ export interface ApiResponse<T> {
   error: Error | null;
 }
 
-// 폼 데이터 타입
-export interface LoginFormData {
-  email: string;
-  password: string;
-}
-
-export interface PasswordChangeFormData {
-  currentPassword: string;
-  newPassword: string;
-  confirmPassword: string;
-}
 
 export interface AttendanceFormData {
   startTime: string;
@@ -168,11 +41,6 @@ export interface AttendanceFormData {
   notes?: string;
 }
 
-// 컴포넌트 Props 타입
-export interface KimbapIconProps {
-  size?: number;
-  className?: string;
-}
 
 export interface TabItem {
   id: string;

@@ -1,6 +1,6 @@
 // app/login/page.tsx (서버 컴포넌트)
 import { Metadata } from 'next';
-import LoginForm from '@/components/auth/LoginForm';
+import { LoginForm } from '@/components/auth/LoginForm';
 
 export const metadata: Metadata = {
   title: '로그인 - 코드 김밥',

@@ -6,10 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { GimbapIcon } from "@/components/icon/GimbapIcon";
 import { Mail, Lock } from "lucide-react";
-import type { LoginFormData } from "@/types";
 import { createClient } from "@/utils/supabase/client";
 
-const LoginForm: React.FC = () => {
+export interface LoginFormData {
+  email: string;
+  password: string;
+}
+
+export const LoginForm = () => {
   const supabase = createClient();
   const [formData, setFormData] = useState<LoginFormData>({
     email: "",
@@ -32,10 +36,12 @@ const LoginForm: React.FC = () => {
     setError("");
 
     try {
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
-        email: formData.email,
-        password: formData.password,
-      });
+      const { data, error: authError } = await supabase.auth.signInWithPassword(
+        {
+          email: formData.email,
+          password: formData.password,
+        }
+      );
 
       if (authError) {
         // Supabase에서 반환된 에러 메시지를 사용자 친화적으로 변경
@@ -168,5 +174,3 @@ const LoginForm: React.FC = () => {
     </div>
   );
 };
-
-export default LoginForm;
