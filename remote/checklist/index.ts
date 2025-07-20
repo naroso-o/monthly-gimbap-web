@@ -25,6 +25,7 @@ export const useBlogPostCheckQuery = (periodId: string) => {
         };
       }
     },
+    enabled: !!periodId,
   });
 };
 
@@ -55,6 +56,7 @@ export const useAttendanceCheckQuery = (periodId: string) => {
 
       return data;
     },
+    enabled: !!periodId,
   });
 };
 
@@ -81,6 +83,7 @@ export const useCommentsCheckQuery = (periodId: string) => {
         };
       }
     },
+    enabled: !!periodId,
   });
 };
 
@@ -100,5 +103,6 @@ export const useCommentsQuery = (commentId: string) => {
 
       return data;
     },
+    enabled: !!commentId,
   });
 };

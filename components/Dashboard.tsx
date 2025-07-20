@@ -9,17 +9,12 @@ import {
   useCommentsCheckQuery,
   useCommentsQuery,
 } from "../remote/checklist";
-import { useCurrentPeriodQuery } from "../remote/period";
 import { toast } from "sonner";
 
-export function Dashboard() {
-
-  const { data: currentPeriod } = useCurrentPeriodQuery();
-  const { data: blogPostChecklist } = useBlogPostCheckQuery(currentPeriod?.id);
-  const { data: attendanceChecklist } = useAttendanceCheckQuery(
-    currentPeriod?.id
-  );
-  const { data: commentsCheck } = useCommentsCheckQuery(currentPeriod?.id);
+export function Dashboard({ periodId }: { periodId: string }) {
+  const { data: blogPostChecklist } = useBlogPostCheckQuery(periodId);
+  const { data: attendanceChecklist } = useAttendanceCheckQuery(periodId);
+  const { data: commentsCheck } = useCommentsCheckQuery(periodId);
   const { data: comments } = useCommentsQuery(commentsCheck?.id || "");
 
   const completedCount = [
@@ -54,7 +49,12 @@ export function Dashboard() {
           description="이번 달 블로그 글 1개 작성하기"
           isCompleted={blogPostChecklist?.is_completed || false}
           button={
-            <Button variant="primary" size="sm" className="w-full text-sm" onClick={handleUnimplementedFunction}>
+            <Button
+              variant="primary"
+              size="sm"
+              className="w-full text-sm"
+              onClick={handleUnimplementedFunction}
+            >
               {blogPostChecklist?.is_completed ? "완료!" : "글 작성 체크"}
             </Button>
           }
@@ -68,7 +68,12 @@ export function Dashboard() {
           }/2)`}
           isCompleted={attendanceChecklist?.is_completed}
           button={
-            <Button variant="primary" size="sm" className="w-full text-sm" onClick={handleUnimplementedFunction}>
+            <Button
+              variant="primary"
+              size="sm"
+              className="w-full text-sm"
+              onClick={handleUnimplementedFunction}
+            >
               {attendanceChecklist?.is_completed ? "완료!" : "출석 기록하기"}
             </Button>
           }
@@ -80,7 +85,12 @@ export function Dashboard() {
           description={`월 4명 이상에게 댓글 달기 (${comments?.length || 0}/4)`}
           isCompleted={commentsCheck?.is_completed || false}
           button={
-            <Button variant="primary" size="sm" className="w-full text-sm" onClick={handleUnimplementedFunction}>
+            <Button
+              variant="primary"
+              size="sm"
+              className="w-full text-sm"
+              onClick={handleUnimplementedFunction}
+            >
               {commentsCheck?.is_completed ? "완료!" : "댓글 작성하기"}
             </Button>
           }
