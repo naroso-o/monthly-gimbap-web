@@ -16,53 +16,12 @@ import {
   useDailyAttendanceSummaryQuery,
   useAttendanceStatusQuery,
 } from "@/remote/attendance";
-import { useCurrentPeriodQuery } from "../../../remote/period";
-
-// 한국 시간 유틸리티 함수
-const getKoreanDate = (date?: Date) => {
-  const targetDate = date || new Date();
-  // UTC 시간에 9시간 추가하여 한국 시간으로 변환
-  const koreanTime = new Date(targetDate.getTime() + (9 * 60 * 60 * 1000));
-  return koreanTime.toISOString().split('T')[0]; // YYYY-MM-DD 형식
-};
-
-// UTC 시간 문자열을 한국 시간으로 변환하는 함수
-const convertUTCToKoreanTime = (timeString: string) => {
-  // 이미 포맷된 시간 문자열인지 확인 (예: "14:30")
-  if (timeString.match(/^\d{1,2}:\d{2}$/)) {
-    return timeString;
-  }
-  
-  // ISO 날짜 문자열인 경우 변환
-  try {
-    // DB에서 온 UTC 시간 문자열을 Date 객체로 파싱
-    const utcDate = new Date(timeString);
-    
-    if (isNaN(utcDate.getTime())) {
-      console.warn("유효하지 않은 날짜 형식:", timeString);
-      return timeString; // 변환 실패시 원본 반환
-    }
-    
-    // 한국 시간으로 표시 (브라우저가 자동으로 로컬 시간대로 변환)
-    const koreanTimeString = utcDate.toLocaleTimeString("ko-KR", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-      timeZone: "Asia/Seoul", // 명시적으로 한국 시간대 지정
-    });
-    
-    console.log(`시간 변환: ${timeString} (UTC) -> ${koreanTimeString} (KST)`);
-    return koreanTimeString;
-    
-  } catch (error) {
-    console.error("시간 변환 오류:", error, "원본 시간:", timeString);
-    return timeString; // 에러 발생시 원본 반환
-  }
-};
+import { useCurrentPeriodQuery } from "@/remote/period";
 
 export const AttendanceModal = () => {
-  // 한국 시간 기준으로 오늘 날짜 계산
-  const today = getKoreanDate();
+  const now = new Date();
+  // 원본 ISO 날짜 문자열 그대로 사용 (시간대 변환 제거)
+  const today = now.toISOString().split("T")[0];
 
   const { data: dailyAttendanceSummary } =
     useDailyAttendanceSummaryQuery(today);
@@ -74,7 +33,7 @@ export const AttendanceModal = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
 
-  // 1초마다 현재 시간 업데이트 (로컬 시간 사용)
+  // 1초마다 현재 시간 업데이트
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
@@ -119,17 +78,6 @@ export const AttendanceModal = () => {
           isActive: false,
         };
     }
-  };
-
-  // 시계 표시용 포맷팅 (로컬 시간 사용)
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString("ko-KR", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: false,
-      timeZone: "Asia/Seoul",
-    });
   };
 
   const handleSubmit = async () => {
@@ -190,8 +138,14 @@ export const AttendanceModal = () => {
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
               )}
             </div>
-            <p className="text-sm text-diary-muted">
-              현재 시간: {formatTime(currentTime)}
+            <p className="text-xs text-diary-muted">
+              현재 시간: {currentTime.toLocaleTimeString("ko-KR", {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: false,
+                timeZone: "Asia/Seoul",
+              })}
             </p>
             <p className="text-xs text-diary-muted">
               익일 6시에 자동 초기화됩니다.
@@ -220,8 +174,13 @@ export const AttendanceModal = () => {
                         <span className="text-diary-text">{record.type}</span>
                       </div>
                       <span className="text-diary-muted">
-                        {/* UTC 시간을 한국 시간으로 변환 */}
-                        {convertUTCToKoreanTime(record.time)}
+                        {new Date(record.time).toLocaleTimeString("ko-KR", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          second: "2-digit",
+                          hour12: false,
+                          timeZone: "Asia/Seoul",
+                        })}
                       </span>
                     </div>
                   ))}

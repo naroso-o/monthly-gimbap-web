@@ -2,13 +2,6 @@ import { createClient } from "../../utils/supabase/client";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { queryKeys } from "../keys";
 
-// 한국 시간 유틸리티 함수들
-const getKoreanDate = (date?: Date) => {
-  const targetDate = date || new Date();
-  // 로컬 시간(이미 한국 시간)을 YYYY-MM-DD 형식으로 변환
-  return targetDate.toLocaleDateString('sv-SE'); // YYYY-MM-DD 형식
-};
-
 // 기존 호환성을 위한 인터페이스
 export interface ChecklistAttendance {
   id: string;
@@ -45,12 +38,12 @@ export interface DailyAttendanceDetail {
   session_hours: number | null;
 }
 
-// 일별 출석 요약 (총 활동시간 제거)
+// 일별 출석 요약 (전체 datetime 받기)
 export interface DailyAttendanceSummary {
   session_count: number;
   current_status: "start" | "end" | "restart";
   sessions: Array<{
-    time: string;
+    time: string; // 전체 UTC datetime ISO string (2025-01-23T14:23:00Z 형태)
     type: string;
   }>;
 }
@@ -143,7 +136,7 @@ export const useDailyAttendanceStatsQuery = (periodId: string) => {
   });
 };
 
-// 현재 출석 상태 쿼리 (한국 시간 기준)
+// 현재 출석 상태 쿼리 (시간대 변환 제거)
 export const useAttendanceStatusQuery = (date?: string) => {
   const supabase = createClient();
 
@@ -153,8 +146,8 @@ export const useAttendanceStatusQuery = (date?: string) => {
       const { data: user } = await supabase.auth.getUser();
       if (!user.user?.id) throw new Error("User not authenticated");
 
-      // 한국 시간 기준으로 날짜 계산
-      const targetDate = date || getKoreanDate();
+      // 원본 ISO 날짜 문자열 그대로 사용
+      const targetDate = date || new Date().toISOString().split('T')[0];
 
       const { data, error } = await supabase.rpc("get_attendance_status", {
         p_user_id: user.user.id,
@@ -168,7 +161,7 @@ export const useAttendanceStatusQuery = (date?: string) => {
   });
 };
 
-// 오늘의 출석 기록 상세 쿼리 (한국 시간 기준)
+// 오늘의 출석 기록 상세 쿼리 (한국 시간대 고려)
 export const useDailyAttendanceDetailQuery = (date?: string) => {
   const supabase = createClient();
 
@@ -179,7 +172,7 @@ export const useDailyAttendanceDetailQuery = (date?: string) => {
       if (!user.user?.id) throw new Error("User not authenticated");
 
       // 한국 시간 기준으로 날짜 계산
-      const targetDate = date || getKoreanDate();
+      const targetDate = date || new Date().toLocaleDateString('sv-SE'); // YYYY-MM-DD 형식
 
       const { data, error } = await supabase
         .from("view_daily_attendance_detail")
@@ -194,7 +187,7 @@ export const useDailyAttendanceDetailQuery = (date?: string) => {
   });
 };
 
-// 오늘의 출석 요약 쿼리 (한국 시간 기준)
+// 오늘의 출석 요약 쿼리
 export const useDailyAttendanceSummaryQuery = (date?: string) => {
   const supabase = createClient();
 
@@ -204,8 +197,7 @@ export const useDailyAttendanceSummaryQuery = (date?: string) => {
       const { data: user } = await supabase.auth.getUser();
       if (!user.user?.id) throw new Error("User not authenticated");
 
-      // 한국 시간 기준으로 날짜 계산
-      const targetDate = date || getKoreanDate();
+      const targetDate = date || new Date().toISOString().split("T")[0];
 
       const { data, error } = await supabase.rpc(
         "get_daily_attendance_summary",
@@ -233,7 +225,7 @@ export const useDailyAttendanceSummaryQuery = (date?: string) => {
 // Mutation 훅들
 // ========================================
 
-// 출석 체크인/체크아웃 (UTC 시간으로 기록)
+// 출석 체크인/체크아웃
 export const useAttendanceMutation = () => {
   const supabase = createClient();
   const queryClient = useQueryClient();
@@ -255,7 +247,7 @@ export const useAttendanceMutation = () => {
           user_id: user.user.id,
           period_id: periodId,
           type,
-          time: new Date().toISOString(), // UTC 시간으로 기록
+          time: new Date().toISOString(),
         })
         .select()
         .single();
@@ -264,7 +256,7 @@ export const useAttendanceMutation = () => {
       return data;
     },
     onSuccess: (_, variables) => {
-      const today = getKoreanDate(); // 한국 시간 기준 오늘 날짜
+      const today = new Date().toISOString().split("T")[0];
       
       // 관련 쿼리들 무효화
       queryClient.invalidateQueries({ queryKey: ["attendance-status"] });
