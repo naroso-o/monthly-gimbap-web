@@ -1,9 +1,11 @@
 import { Calendar } from "lucide-react";
-import { useAttendanceCheckQuery } from "../../../remote/checklist";
+import { useAttendanceCheckQuery } from "@/remote/attendance";
 import { DashboardCard } from "../DashboardCard";
 import { Button } from "../../ui/button";
+import { useModalStore } from "@/stores/useModalStore";
 
 export const DashboardAttendanceCard = ({ periodId }: { periodId: string }) => {
+  const { setAttendanceModalOpen } = useModalStore();
   const { data: attendanceChecklist } = useAttendanceCheckQuery(periodId);
 
   return (
@@ -19,7 +21,7 @@ export const DashboardAttendanceCard = ({ periodId }: { periodId: string }) => {
           variant="primary"
           size="sm"
           className="w-full text-sm"
-          onClick={() => {}}
+          onClick={() => setAttendanceModalOpen(true)}
         >
           {attendanceChecklist?.is_completed ? "완료!" : "출석 기록하기"}
         </Button>

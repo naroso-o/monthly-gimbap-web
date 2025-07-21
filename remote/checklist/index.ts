@@ -42,48 +42,6 @@ export const useBlogPostCheckQuery = (periodId: string) => {
   });
 };
 
-export interface ChecklistAttendance {
-  id: string;
-  user_id: string;
-  period_id: string;
-  is_completed: boolean;
-  wednesday_count: number;
-  total_attendance_count: number;
-  created_at: string;
-  updated_at: string;
-}
-
-export const useAttendanceCheckQuery = (periodId: string) => {
-  const supabase = createClient();
-  const { queryKey } = queryKeys.checklist.attendance(periodId);
-
-  return useQuery<ChecklistAttendance | null>({
-    queryKey,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("checklist_attendances")
-        .select("*")
-        .eq("period_id", periodId)
-        .maybeSingle();
-
-      if (error) throw error;
-
-      // 데이터가 없으면 기본값 반환
-      if (!data) {
-        return {
-          id: null,
-          period_id: periodId,
-          wednesday_count: 0,
-          is_completed: false,
-        };
-      }
-
-      return data;
-    },
-    enabled: !!periodId,
-  });
-};
-
 export interface ChecklistComment {
   id: string;
   user_id: string;
