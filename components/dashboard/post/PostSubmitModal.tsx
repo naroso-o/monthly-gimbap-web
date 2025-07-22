@@ -61,6 +61,7 @@ export function PostSubmitModal() {
       setIssueUrl("");
       setPostSubmitModalOpen(false);
     } catch (err) {
+      console.error(err);
       setError("제출 중 오류가 발생했습니다. 다시 시도해주세요.");
     } finally {
       setIsSubmitting(false);
