@@ -1,6 +1,5 @@
 import { Metadata } from "next";
 import { Header } from "@/components/layout/Header";
-import { BottomNavigation } from "@/components/layout/BottomNavigation";
 import { DashboardSection } from "../components/dashboard/DashboardSection";
 
 export const metadata: Metadata = {

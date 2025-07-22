@@ -86,6 +86,9 @@ export const SignupForm = () => {
 
       // 2. public.users 테이블에 사용자 정보 추가
       if (authData.user) {
+        // 잠시 기다린 후 프로필 생성 (auth.users 생성 완료 대기)
+        await new Promise(resolve => setTimeout(resolve, 100));
+
         const { error: profileError } = await supabase
           .from("users")
           .insert({
@@ -97,15 +100,34 @@ export const SignupForm = () => {
 
         if (profileError) {
           console.error("Profile creation error:", profileError);
-          setError("사용자 프로필 생성 중 오류가 발생했습니다.");
+          
+          // 구체적인 에러 메시지 처리
+          if (profileError.code === '23505') {
+            setError("이미 등록된 사용자입니다.");
+          } else if (profileError.message.includes('duplicate key')) {
+            setError("이미 등록된 이메일 주소입니다.");
+          } else if (profileError.message.includes('violates foreign key')) {
+            setError("사용자 등록 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+          } else if (profileError.code === '42501') {
+            setError("사용자 등록 권한이 없습니다. 관리자에게 문의해주세요.");
+          } else {
+            setError(`프로필 생성 오류: ${profileError.message}`);
+          }
+          
+          // 프로필 생성 실패 시 auth 사용자 정리는 하지 않음 (이메일 인증 때문에)
+          // Supabase Auth는 이메일 인증이 필요하므로 그대로 두고
+          // 사용자가 이메일 인증 후 다시 로그인하면 RLS 정책에 의해 자동으로 프로필 생성됨
+          
           return;
         }
+      } else {
+        setError("사용자 생성에 실패했습니다.");
+        return;
       }
 
       setSuccess(true);
     } catch (err) {
       console.error("Signup error:", err);
-      setError("네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
     } finally {
       setLoading(false);
     }
@@ -250,7 +272,7 @@ export const SignupForm = () => {
 
               {error && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                  <p className="text-red-600 text-sm">{error}</p>
+                  <p className="text-red-600 text-sm whitespace-pre-line">{error}</p>
                 </div>
               )}
 
