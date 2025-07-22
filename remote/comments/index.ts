@@ -19,6 +19,11 @@ export interface BlogPost {
   updated_at: string;
 }
 
+export interface ExtendedBlogPost extends BlogPost {
+  has_commented?: boolean;
+  author_name?: string;
+}
+
 export interface MonthlyCommentStats {
   user_id: string;
   user_name: string;

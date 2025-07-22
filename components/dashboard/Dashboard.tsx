@@ -8,12 +8,15 @@ import { AttendanceModal } from "./attendance/AttendanceModal";
 import { useAttendanceCheckQuery } from "@/remote/attendance";
 import { CommentModal } from "./comments/CommentModal";
 import { useUserCommentStatusQuery } from "@/remote/comments";
+import { useBlogPostCheckQuery } from "@/remote/blog";
 
 export function Dashboard({ periodId }: { periodId: string }) {
   const { data: attendanceChecklist } = useAttendanceCheckQuery(periodId);
   const { data: userCommentStatus } = useUserCommentStatusQuery(periodId);
+  const { data: blogPostCheck } = useBlogPostCheckQuery(periodId);
   
   const completedCount = [
+    blogPostCheck?.is_completed,
     attendanceChecklist?.is_completed,
     userCommentStatus?.is_completed,
   ].filter(Boolean).length;

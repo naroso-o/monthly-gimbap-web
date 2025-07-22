@@ -14,16 +14,23 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ExternalLink, CheckCircle2 } from "lucide-react";
-import { useModalStore } from "../../../stores/useModalStore";
-import { useCreatePostMutation } from "../../../remote/blog";
+import { useModalStore } from "@/stores/useModalStore";
+import { useCreatePostMutation, useBlogPostCheckQuery } from "@/remote/blog";
+import { useCurrentPeriodQuery } from "@/remote/period";
 
 export function PostSubmitModal() {
   const { postSubmitModalOpen, setPostSubmitModalOpen } = useModalStore();
   const { mutate: createPost } = useCreatePostMutation();
+  const { data: currentPeriod } = useCurrentPeriodQuery();
+  const { data: blogPostCheck } = useBlogPostCheckQuery(
+    currentPeriod?.id || ""
+  );
 
   const [issueUrl, setIssueUrl] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+
+  const isCompleted = blogPostCheck?.is_completed || false;
 
   const validateGithubUrl = (url: string) => {
     const githubIssuePattern =
@@ -50,8 +57,6 @@ export function PostSubmitModal() {
     setIsSubmitting(true);
 
     try {
-      // 실제로는 여기서 API 호출
-      await new Promise((resolve) => setTimeout(resolve, 1000));
       createPost({ issueUrl });
       setIssueUrl("");
       setPostSubmitModalOpen(false);
@@ -74,27 +79,26 @@ export function PostSubmitModal() {
         <DialogClose onClick={handleClose} />
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            {/* {isCompleted ? ( */}
-              {/* <> */}
-                {/* <CheckCircle2 className="w-5 h-5 text-diary-accent" /> */}
-                {/* 블로그 글 완료! */}
-              {/* </> */}
-            {/* ) : ( */}
+            {isCompleted ? (
+              <>
+                <CheckCircle2 className="w-5 h-5 text-diary-accent" />
+                블로그 글 완료!
+              </>
+            ) : (
               <>
                 <ExternalLink className="w-5 h-5 text-diary-muted" />
                 블로그 글 작성 체크
               </>
-            {/* )} */}
+            )}
           </DialogTitle>
           <DialogDescription>
-            {/* {isCompleted */}
-            {/* ? "이미 이번 달 블로그 글을 완료하셨습니다! 🎉" */}
-            {/* : "작성한 블로그 글의 GitHub Issue URL을 제출해주세요."} */}
-            작성한 블로그 글의 GitHub Issue URL을 제출해주세요.
+            {isCompleted
+              ? "이미 이번 달 블로그 글을 완료하셨습니다! 🎉"
+              : "작성한 블로그 글의 GitHub Issue URL을 제출해주세요."}
           </DialogDescription>
         </DialogHeader>
 
-        {/* {!isCompleted && ( */}
+        {!isCompleted && (
           <form onSubmit={handleSubmit} className="p-6 pt-0 space-y-4">
             <div className="space-y-2">
               <label
@@ -140,22 +144,35 @@ export function PostSubmitModal() {
               </Button>
             </div>
           </form>
-        {/* )} */}
+        )}
 
-        {/* {isCompleted && ( */}
-          {/* <div className="p-6 pt-0">
+        {isCompleted && (
+          <div className="p-6 pt-0">
             <div className="text-center p-4 bg-green-50 border border-green-200 rounded-lg">
               <CheckCircle2 className="w-8 h-8 text-green-600 mx-auto mb-2" />
               <p className="text-green-700 font-medium mb-1">완료되었습니다!</p>
               <p className="text-green-600 text-sm">
                 이번 달 블로그 글 작성을 완료하셨어요. 수고하셨습니다! 🎉
               </p>
+              {blogPostCheck?.github_issue_url && (
+                <div className="mt-3 p-2 bg-white border border-green-200 rounded">
+                  <p className="text-xs text-green-600 mb-1">제출된 URL:</p>
+                  <a
+                    href={blogPostCheck.github_issue_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-green-700 underline break-all"
+                  >
+                    {blogPostCheck.github_issue_url}
+                  </a>
+                </div>
+              )}
             </div>
             <Button onClick={handleClose} className="w-full mt-4">
               확인
             </Button>
-          </div> */}
-        {/* )} */}
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );

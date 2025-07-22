@@ -11,10 +11,10 @@ export interface User {
   updated_at: string;
 }
 
-// 유저 정보 조회
+/** 로그인한 유저 정보 조회 */
 export const useUserQuery = () => {
   const supabase = createClient();
-  const { queryKey } = queryKeys.users.information();
+  const { queryKey } = queryKeys.users.current();
 
   return useQuery<User | null>({
     queryKey,
@@ -42,6 +42,25 @@ export const useUserQuery = () => {
   });
 };
 
+/** 유저 정보 조회 */
+export const useUserInfoQuery = (userId: string) => {
+  const supabase = createClient();
+  const { queryKey } = queryKeys.users.information(userId);
+
+  return useQuery<User | null>({
+    queryKey,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("users")
+        .select("*")
+        .eq("id", userId)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+};
+
 export interface AuthUser {
   id: string;
   email?: string;
@@ -63,7 +82,7 @@ export interface AuthSession {
 export const useUpdateUserMutation = () => {
   const supabase = createClient();
   const queryClient = useQueryClient();
-  const { queryKey } = queryKeys.users.information();
+  const { queryKey } = queryKeys.users.current();
 
   return useMutation<
     AuthUser | null,

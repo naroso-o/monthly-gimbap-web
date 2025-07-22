@@ -1,9 +1,8 @@
 import { PenTool } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useBlogPostCheckQuery } from "@/remote/checklist";
 import { DashboardCard } from "../DashboardCard";
 import { useModalStore } from "@/stores/useModalStore";
-import { useBlogPostsQuery } from "../../../remote/blog";
+import { useBlogPostsQuery, useBlogPostCheckQuery } from "@/remote/blog";
 
 export const DashboardPostCard = ({ periodId }: { periodId: string }) => {
   const { setPostSubmitModalOpen } = useModalStore();

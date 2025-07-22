@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { GimbapIcon } from "@/components/icon/GimbapIcon";
 import { Mail, Lock } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
+import Link from "next/link";
 
 export interface LoginFormData {
   email: string;
@@ -48,7 +49,7 @@ export const LoginForm = () => {
         if (authError.message === "Invalid login credentials") {
           setError("이메일 또는 비밀번호가 올바르지 않습니다.");
         } else if (authError.message === "Email not confirmed") {
-          setError("이메일 인증이 필요합니다.");
+          setError("이메일 인증이 필요합니다. 이메일을 확인해주세요.");
         } else if (authError.message === "Too many requests") {
           setError(
             "너무 많은 로그인 시도가 있었습니다. 잠시 후 다시 시도해주세요."
@@ -90,6 +91,11 @@ export const LoginForm = () => {
 
         <Card className="bg-white border border-stone-200 shadow-sm">
           <CardContent className="p-6">
+            <div className="text-center mb-6">
+              <h2 className="text-lg font-medium text-stone-700 mb-1">로그인</h2>
+              <p className="text-sm text-stone-500">스터디에 참여하세요</p>
+            </div>
+
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <div className="relative">
@@ -164,6 +170,15 @@ export const LoginForm = () => {
                 )}
               </Button>
             </form>
+
+            <div className="text-center mt-4">
+              <p className="text-sm text-stone-500">
+                아직 계정이 없으신가요?
+                <Link href="/signup" className="text-stone-700 hover:underline font-medium">
+                  회원가입
+                </Link>
+              </p>
+            </div>
           </CardContent>
         </Card>
 

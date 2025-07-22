@@ -2,32 +2,28 @@
 
 import { useState } from "react";
 import { Card, CardContent } from "../ui/card";
-
-interface AttendanceData {
-  [key: string]: {
-    attended: boolean;
-    duration: number; // 분 단위
-  };
-}
-
-// 더미 출석 데이터
-const mockAttendanceData: AttendanceData = {
-  "2025-07-03": { attended: true, duration: 45 },
-  "2025-07-05": { attended: true, duration: 120 },
-  "2025-07-10": { attended: true, duration: 30 },
-  "2025-07-12": { attended: true, duration: 90 },
-  "2025-07-15": { attended: true, duration: 60 },
-  "2025-07-17": { attended: true, duration: 150 },
-  "2025-07-20": { attended: true, duration: 75 },
-  "2025-07-22": { attended: true, duration: 40 },
-  "2025-07-24": { attended: true, duration: 110 },
-};
+import {
+  useCalendarAttendanceQuery,
+  CalendarAttendanceData,
+} from "@/remote/calendar";
+import {
+  formatDateForKey,
+  formatDuration,
+  getAttendanceColor,
+} from "@/utils/calendar";
 
 export function DashboardCalendar({ periodId }: { periodId: string }) {
   const [currentDate] = useState(new Date());
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
+
+  // 캘린더 출석 데이터 조회
+  const {
+    data: attendanceData,
+    isLoading,
+    error,
+  } = useCalendarAttendanceQuery(periodId);
 
   // 이번 달 첫날과 마지막날
   const firstDay = new Date(year, month, 1);
@@ -58,20 +54,6 @@ export function DashboardCalendar({ periodId }: { periodId: string }) {
     days.push({ date, isCurrentMonth: false });
   }
 
-  const getAttendanceColor = (duration: number) => {
-    if (duration >= 120) return "#8B7355"; // 2시간 이상 - 진한 브라운
-    if (duration >= 60) return "#A67C52"; // 1시간 이상 - 중간 브라운
-    if (duration >= 30) return "#D4A574"; // 30분 이상 - 연한 브라운
-    return "#E6B887"; // 30분 미만 - 가장 연한 브라운
-  };
-
-  const formatDate = (date: Date) => {
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-      2,
-      "0"
-    )}-${String(date.getDate()).padStart(2, "0")}`;
-  };
-
   const monthNames = [
     "1월",
     "2월",
@@ -86,6 +68,34 @@ export function DashboardCalendar({ periodId }: { periodId: string }) {
     "11월",
     "12월",
   ];
+
+  // 실제 출석 데이터 또는 빈 객체
+  const actualAttendanceData: CalendarAttendanceData =
+    attendanceData?.attendance_data || {};
+
+  // 로딩 중일 때
+  if (isLoading) {
+    return (
+      <Card className="h-full">
+        <CardContent className="p-4 h-full flex items-center justify-center">
+          <div className="text-diary-muted">출석 데이터를 불러오는 중...</div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // 에러 발생 시
+  if (error) {
+    return (
+      <Card className="h-full">
+        <CardContent className="p-4 h-full flex items-center justify-center">
+          <div className="text-red-600 text-sm">
+            출석 데이터를 불러오는데 실패했습니다.
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="h-full">
@@ -115,6 +125,7 @@ export function DashboardCalendar({ periodId }: { periodId: string }) {
             </div>
           </div>
         </div>
+
         {/* 요일 헤더 */}
         <div className="grid grid-cols-7 gap-1 mb-2">
           {["일", "월", "화", "수", "목", "금", "토"].map((day) => (
@@ -126,11 +137,12 @@ export function DashboardCalendar({ periodId }: { periodId: string }) {
             </div>
           ))}
         </div>
+
         {/* 날짜 그리드 */}
         <div className="grid grid-cols-7 gap-1">
           {days.map((day, index) => {
-            const dateKey = formatDate(day.date);
-            const attendanceInfo = mockAttendanceData[dateKey];
+            const dateKey = formatDateForKey(day.date);
+            const attendanceInfo = actualAttendanceData[dateKey];
             const isToday =
               day.date.toDateString() === new Date().toDateString();
 
@@ -138,6 +150,22 @@ export function DashboardCalendar({ periodId }: { periodId: string }) {
               <div
                 key={index}
                 className="aspect-square flex items-center justify-center relative"
+                title={
+                  attendanceInfo?.attended
+                    ? `${formatDuration(attendanceInfo.duration)} 접속${
+                        attendanceInfo.first_record
+                          ? ` (${new Date(
+                              attendanceInfo.first_record
+                            ).toLocaleTimeString("ko-KR", {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })} 체크인)`
+                          : ""
+                      }`
+                    : day.isCurrentMonth
+                    ? "출석 없음"
+                    : ""
+                }
               >
                 <span
                   className={`text-xs ${
@@ -171,33 +199,19 @@ export function DashboardCalendar({ periodId }: { periodId: string }) {
             );
           })}
         </div>
+
         {/* 이번 달 출석 요약 */}
         <div className="mt-4 pt-3 border-t border-diary-border">
           <div className="flex justify-between text-xs">
             <span className="text-diary-muted">이번 달 출석</span>
             <span className="text-diary-text font-medium">
-              {
-                Object.keys(mockAttendanceData).filter((key) =>
-                  key.startsWith(
-                    `${year}-${String(month + 1).padStart(2, "0")}`
-                  )
-                ).length
-              }
-              일
+              {attendanceData?.total_attendance_days || 0}일
             </span>
           </div>
           <div className="flex justify-between text-xs mt-1">
             <span className="text-diary-muted">평균 접속 시간</span>
             <span className="text-diary-text font-medium">
-              {Math.round(
-                Object.values(mockAttendanceData)
-                  .filter((data) => data.attended)
-                  .reduce((sum, data) => sum + data.duration, 0) /
-                  Object.values(mockAttendanceData).filter(
-                    (data) => data.attended
-                  ).length
-              )}
-              분
+              {formatDuration(attendanceData?.avg_minutes || 0)}
             </span>
           </div>
         </div>

@@ -4,7 +4,8 @@ import {
 } from "@lukemorales/query-key-factory";
 
 const usersQueryKeys = createQueryKeys("users", {
-  information: () => ["information"],
+  current: () => ["current"],
+  information: (userId) => [userId],
 });
 
 const periodQueryKeys = createQueryKeys("period", {
@@ -21,9 +22,19 @@ const attendanceQueryKeys = createQueryKeys("attendance", {
   list: (periodId) => [periodId],
 });
 
+const calendarQueryKeys = createQueryKeys("calendar", {
+  periodAttendance: (periodId, userId) => [periodId, userId],
+  dailyAttendance: (date, userId) => [date, userId],
+  monthlyAttendance: (year, month, userId) => [year, month, userId],
+  teamAttendance: (periodId) => ["team", periodId],
+  userStats: (periodId, userId) => ["stats", periodId, userId],
+  attendanceDays: (periodId, userId) => ["days", periodId, userId],
+});
+
 export const queryKeys = mergeQueryKeys(
   usersQueryKeys,
   periodQueryKeys,
   checklistQueryKeys,
   attendanceQueryKeys,
+  calendarQueryKeys,
 );
