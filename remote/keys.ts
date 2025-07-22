@@ -1,3 +1,4 @@
+// remote/keys.ts
 import {
   createQueryKeys,
   mergeQueryKeys,
@@ -31,10 +32,18 @@ const calendarQueryKeys = createQueryKeys("calendar", {
   attendanceDays: (periodId, userId) => ["days", periodId, userId],
 });
 
+const memberQueryKeys = createQueryKeys("members", {
+  progress: (periodId) => ["progress", periodId],
+  onlineStatus: () => ["online-status"],
+  summary: (periodId) => ["summary", periodId],
+  teamStats: (periodId) => ["team-stats", periodId],
+});
+
 export const queryKeys = mergeQueryKeys(
   usersQueryKeys,
   periodQueryKeys,
   checklistQueryKeys,
   attendanceQueryKeys,
   calendarQueryKeys,
+  memberQueryKeys,
 );

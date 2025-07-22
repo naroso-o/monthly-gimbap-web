@@ -3,9 +3,9 @@ import { useCurrentPeriodQuery } from "../../remote/period";
 import { Dashboard } from "./Dashboard";
 import { DashboardCalendar } from "./DashboardCalendar";
 import { DashboardHeader } from "./DashboardHeader";
-import { DashboardMembers } from "./DashboardMembers";
+import { DashboardMembers } from "./members/DashboardMembers";
 import { DashboardQuickMenu } from "./DashboardQuickMenu";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 
 export const DashboardSection = () => {
   const { data: currentPeriod } = useCurrentPeriodQuery();
@@ -19,7 +19,7 @@ export const DashboardSection = () => {
   const [isScrolling, setIsScrolling] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   
-  const sections = [headerSectionRef, dashboardSectionRef, bottomSectionRef];
+  const sections = useMemo(() => [headerSectionRef, dashboardSectionRef, bottomSectionRef], []);
   
   // 모바일 감지
   useEffect(() => {
