@@ -13,7 +13,8 @@ export default function HomePage() {
     <div className="pb-[var(--bottom-menu-height)]">
       <Header />
       <DashboardSection />
-      <BottomNavigation />
+      {/* TODO */}
+      {/* <BottomNavigation /> */} 
     </div>
   );
 }
