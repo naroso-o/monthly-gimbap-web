@@ -6,6 +6,9 @@ interface ModalState {
 
   attendanceModalOpen: boolean;
   setAttendanceModalOpen: (open: boolean) => void;
+
+  commentModalOpen: boolean;
+  setCommentModalOpen: (open: boolean) => void;
 }
 
 export const useModalStore = create<ModalState>((set) => ({
@@ -14,4 +17,7 @@ export const useModalStore = create<ModalState>((set) => ({
 
   attendanceModalOpen: false,
   setAttendanceModalOpen: (open) => set({ attendanceModalOpen: open }),
+
+  commentModalOpen: false,
+  setCommentModalOpen: (open) => set({ commentModalOpen: open }),
 }));

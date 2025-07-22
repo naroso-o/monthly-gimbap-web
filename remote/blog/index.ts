@@ -7,6 +7,23 @@ export interface CreatePost {
   issueUrl: string;
 }
 
+export const useTotalBlogPostsQuery = (periodId: string) => {
+  const supabase = createClient();
+  const { data: user } = useUserQuery();
+  return useQuery({
+    queryKey: ["total_blog_posts", periodId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("blog_posts")
+        .select("*")
+        .eq("user_id", user?.id)
+        .eq("period_id", periodId);
+      if (error) throw error;
+      return data;
+    },
+  });
+};
+
 export const useBlogPostsQuery = (periodId: string) => {
   const supabase = createClient();
   const { data: user } = useUserQuery();

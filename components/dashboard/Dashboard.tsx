@@ -4,27 +4,25 @@ import { DashboardPostCard } from "./post/DashboardPostCard";
 import { PostSubmitModal } from "./post/PostSubmitModal";
 import { DashboardCommentsCard } from "./comments/DashboardCommentsCard";
 import { DashboardAttendanceCard } from "./attendance/DashboardAttendanceCard";
-import {
-  useBlogPostCheckQuery,
-  useCommentsCheckQuery,
-} from "../../remote/checklist";
 import { AttendanceModal } from "./attendance/AttendanceModal";
-import { useAttendanceCheckQuery } from "../../remote/attendance";
+import { useAttendanceCheckQuery } from "@/remote/attendance";
+import { CommentModal } from "./comments/CommentModal";
+import { useUserCommentStatusQuery } from "@/remote/comments";
 
 export function Dashboard({ periodId }: { periodId: string }) {
-  const { data: blogPostChecklist } = useBlogPostCheckQuery(periodId);
   const { data: attendanceChecklist } = useAttendanceCheckQuery(periodId);
-  const { data: commentsChecklist } = useCommentsCheckQuery(periodId);
+  const { data: userCommentStatus } = useUserCommentStatusQuery(periodId);
+  
   const completedCount = [
-    blogPostChecklist?.is_completed,
     attendanceChecklist?.is_completed,
-    commentsChecklist?.is_completed,
+    userCommentStatus?.is_completed,
   ].filter(Boolean).length;
 
   return (
     <>
       <PostSubmitModal />
       <AttendanceModal />
+      <CommentModal />
       {/* 체크리스트 요약 */}
       <div className="mb-6 text-center">
         <div className="inline-flex items-center justify-center w-20 h-20 rounded-full border-2 border-stone-300 bg-white mb-4">
