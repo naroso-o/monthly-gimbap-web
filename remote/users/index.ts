@@ -121,3 +121,93 @@ export const useUpdateUserMutation = () => {
     },
   });
 };
+
+// 회원가입 인터페이스
+export interface SignupData {
+  email: string;
+  password: string;
+  name: string;
+}
+
+// 회원가입 Mutation
+export const useSignupMutation = () => {
+  const supabase = createClient();
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    { user: AuthUser | null; needsEmailConfirmation: boolean },
+    Error,
+    SignupData
+  >({
+    mutationFn: async ({ email, password, name }: SignupData) => {
+      // 1단계: Supabase Auth에 사용자 생성
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name, // Database trigger가 사용할 user_metadata에 name 포함
+          }
+        }
+      });
+
+      if (authError) {
+        throw authError;
+      }
+
+      if (!authData.user) {
+        throw new Error("사용자 생성에 실패했습니다.");
+      }
+
+      // 2단계: Database Trigger 확인 (선택적)
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        
+        const { data: userProfile, error: profileError } = await supabase
+          .from("users")
+          .select("id")
+          .eq("id", authData.user.id)
+          .maybeSingle();
+
+        if (profileError) {
+          console.error("Profile check error:", profileError);
+        }
+
+        if (!userProfile) {
+          console.warn("Profile not found after trigger, but continuing with signup");
+        } else {
+          console.log("User profile created via database trigger");
+        }
+      } catch (profileCheckError) {
+        console.error("Profile verification failed:", profileCheckError);
+      }
+
+      return {
+        user: authData.user,
+        needsEmailConfirmation: !authData.user.email_confirmed_at
+      };
+    },
+    onSuccess: () => {
+      // 사용자 관련 쿼리들 무효화
+      queryClient.invalidateQueries({ queryKey: queryKeys.users.current().queryKey });
+    },
+  });
+};
+
+// 이메일 재전송 Mutation
+export const useResendEmailMutation = () => {
+  const supabase = createClient();
+
+  return useMutation<void, Error, { email: string }>({
+    mutationFn: async ({ email }) => {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email,
+      });
+      
+      if (error) {
+        throw error;
+      }
+    },
+  });
+};
