@@ -10,7 +10,27 @@ import {
   formatDateForKey,
   formatDuration,
   getAttendanceColor,
+  getCalendarDays,
 } from "@/utils/calendar";
+import { DashboardCalendarLegends } from "./calendar/DashboardCalendarLegends";
+import { DashboardCalendarSummary } from "./calendar/DashboardCalendarSummary";
+
+const MONTH_NAMES = [
+  "1월",
+  "2월",
+  "3월",
+  "4월",
+  "5월",
+  "6월",
+  "7월",
+  "8월",
+  "9월",
+  "10월",
+  "11월",
+  "12월",
+];
+
+const DAY_NAMES = ["일", "월", "화", "수", "목", "금", "토"];
 
 export function DashboardCalendar({ periodId }: { periodId: string }) {
   const [currentDate] = useState(new Date());
@@ -18,56 +38,13 @@ export function DashboardCalendar({ periodId }: { periodId: string }) {
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
 
-  // 캘린더 출석 데이터 조회
   const {
     data: attendanceData,
     isLoading,
     error,
   } = useCalendarAttendanceQuery(periodId);
 
-  // 이번 달 첫날과 마지막날
-  const firstDay = new Date(year, month, 1);
-  const lastDay = new Date(year, month + 1, 0);
-
-  // 첫 주의 시작 요일 (일요일 = 0)
-  const startDay = firstDay.getDay();
-
-  // 달력에 표시할 날짜들 생성
-  const days = [];
-
-  // 이전 달의 마지막 날들
-  for (let i = startDay - 1; i >= 0; i--) {
-    const date = new Date(year, month, -i);
-    days.push({ date, isCurrentMonth: false });
-  }
-
-  // 이번 달 날짜들
-  for (let i = 1; i <= lastDay.getDate(); i++) {
-    const date = new Date(year, month, i);
-    days.push({ date, isCurrentMonth: true });
-  }
-
-  // 다음 달 첫 날들 (6주 완성을 위해)
-  const remainingDays = 42 - days.length;
-  for (let i = 1; i <= remainingDays; i++) {
-    const date = new Date(year, month + 1, i);
-    days.push({ date, isCurrentMonth: false });
-  }
-
-  const monthNames = [
-    "1월",
-    "2월",
-    "3월",
-    "4월",
-    "5월",
-    "6월",
-    "7월",
-    "8월",
-    "9월",
-    "10월",
-    "11월",
-    "12월",
-  ];
+  const days = getCalendarDays(year, month);
 
   // 실제 출석 데이터 또는 빈 객체
   const actualAttendanceData: CalendarAttendanceData =
@@ -102,33 +79,14 @@ export function DashboardCalendar({ periodId }: { periodId: string }) {
       <CardContent className="p-4 h-full flex flex-col">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-medium text-diary-text">
-            {year}년 {monthNames[month]}
+            {year}년 {MONTH_NAMES[month]}
           </h3>
-          <div className="flex items-center gap-2 text-xs text-diary-muted">
-            <div className="flex items-center gap-1">
-              <div className="w-2 h-2 rounded-full bg-diary-border"></div>
-              <span>미접속</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div
-                className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: "#E6B887" }}
-              ></div>
-              <span>30분미만</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div
-                className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: "#8B7355" }}
-              ></div>
-              <span>2시간이상</span>
-            </div>
-          </div>
+          <DashboardCalendarLegends />
         </div>
 
         {/* 요일 헤더 */}
         <div className="grid grid-cols-7 gap-1 mb-2">
-          {["일", "월", "화", "수", "목", "금", "토"].map((day) => (
+          {DAY_NAMES.map((day) => (
             <div
               key={day}
               className="text-center text-xs text-diary-muted py-1"
@@ -182,7 +140,7 @@ export function DashboardCalendar({ periodId }: { periodId: string }) {
                 {/* 출석 표시 원 */}
                 {day.isCurrentMonth && (
                   <div
-                    className="absolute bottom-0.5 right-0.5 w-3 h-3 rounded-full"
+                    className="absolute bottom-0.5 right-0.5 w-2 h-2 rounded-full"
                     style={{
                       backgroundColor: attendanceInfo?.attended
                         ? getAttendanceColor(attendanceInfo.duration)
@@ -201,20 +159,10 @@ export function DashboardCalendar({ periodId }: { periodId: string }) {
         </div>
 
         {/* 이번 달 출석 요약 */}
-        <div className="mt-4 pt-3 border-t border-diary-border">
-          <div className="flex justify-between text-xs">
-            <span className="text-diary-muted">이번 달 출석</span>
-            <span className="text-diary-text font-medium">
-              {attendanceData?.total_attendance_days || 0}일
-            </span>
-          </div>
-          <div className="flex justify-between text-xs mt-1">
-            <span className="text-diary-muted">평균 접속 시간</span>
-            <span className="text-diary-text font-medium">
-              {formatDuration(attendanceData?.avg_minutes || 0)}
-            </span>
-          </div>
-        </div>
+        <DashboardCalendarSummary
+          totalAttendanceDays={attendanceData?.total_attendance_days || 0}
+          avgMinutes={attendanceData?.avg_minutes || 0}
+        />
       </CardContent>
     </Card>
   );

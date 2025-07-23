@@ -46,3 +46,35 @@ export const calculateAttendanceRate = (
   if (totalDays === 0) return 0;
   return Math.round((attendanceDays / totalDays) * 100);
 };
+
+export const getCalendarDays = (year: number, month: number) => {
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+
+   // 첫 주의 시작 요일 (일요일 = 0)
+   const startDay = firstDay.getDay();
+
+   // 달력에 표시할 날짜들 생성
+   const days = [];
+ 
+   // 이전 달의 마지막 날들
+   for (let i = startDay - 1; i >= 0; i--) {
+     const date = new Date(year, month, -i);
+     days.push({ date, isCurrentMonth: false });
+   }
+ 
+   // 이번 달 날짜들
+   for (let i = 1; i <= lastDay.getDate(); i++) {
+     const date = new Date(year, month, i);
+     days.push({ date, isCurrentMonth: true });
+   }
+ 
+   // 다음 달 첫 날들 (6주 완성을 위해)
+   const remainingDays = 42 - days.length;
+   for (let i = 1; i <= remainingDays; i++) {
+     const date = new Date(year, month + 1, i);
+     days.push({ date, isCurrentMonth: false });
+   }
+
+   return days;
+}

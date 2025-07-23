@@ -9,6 +9,10 @@
   --diary-border: #e7e5e4;
   --diary-accent: #d4a574;
 
+  --calendar-no-attendance: #e7e5e4;
+  --calendar-less-than-30-minutes: #e6b887;
+  --calendar-more-than-2-hours: #8b7355;
+
   --bottom-menu-height: 64px;
 }
 
