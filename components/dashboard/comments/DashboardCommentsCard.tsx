@@ -1,20 +1,19 @@
 import { MessageCircle } from "lucide-react";
 import { DashboardCard } from "../DashboardCard";
 import { Button } from "@/components/ui/button";
-import { useMonthlyCommentStatsQuery, useUserCommentStatusQuery } from "@/remote/comments";
+import { useUserCommentStatusQuery } from "@/remote/comments";
 import { useModalStore } from "@/stores/useModalStore";
 
 export const DashboardCommentsCard = ({ periodId }: { periodId: string }) => {
   const { setCommentModalOpen } = useModalStore();
   const { data: userCommentStatus } = useUserCommentStatusQuery(periodId);
-  const { data: monthlyCommentStats } = useMonthlyCommentStatsQuery(periodId);
 
   return (
     <DashboardCard
       title="댓글 활동"
       icon={<MessageCircle className="w-5 h-5 text-stone-600" />}
-      description={`월 4명 이상에게 댓글 달기 (${monthlyCommentStats?.total_comments_given || 0}/4)`}
-      isCompleted={userCommentStatus?.is_completed || false}
+      description={`월 4명 이상에게 댓글 달기 (${userCommentStatus?.comments_given || 0}/4)`}
+      isCompleted={userCommentStatus?.comments_given && userCommentStatus.comments_given >= 4 || false}
       button={
         <Button
           variant="primary"
@@ -24,7 +23,7 @@ export const DashboardCommentsCard = ({ periodId }: { periodId: string }) => {
             setCommentModalOpen(true);
           }}
         >
-          {userCommentStatus?.is_completed ? "완료!" : "댓글 작성하기"}
+          {userCommentStatus?.comments_given && userCommentStatus.comments_given >= 4 ? "완료!" : "댓글 작성하기"}
         </Button>
       }
     />

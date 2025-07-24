@@ -63,7 +63,6 @@ export interface ChecklistComments {
 // 2. React Query 훅들
 // ========================================
 
-// 사용자별 댓글 현황 조회
 export const useUserCommentStatusQuery = (periodId: string) => {
   const supabase = createClient();
 
@@ -73,59 +72,50 @@ export const useUserCommentStatusQuery = (periodId: string) => {
       const { data: user } = await supabase.auth.getUser();
       if (!user.user?.id) throw new Error("User not authenticated");
 
-      const { data, error } = await supabase.rpc("get_user_comment_status", {
-        p_user_id: user.user.id,
-        p_period_id: periodId,
-      });
+      // 1. 먼저 해당 period의 blog_posts ID들을 가져옴
+      const { data: blogPosts } = await supabase
+        .from('blog_posts')
+        .select('id, user_id')
+        .eq('period_id', periodId);
 
-      if (error) throw error;
+      if (!blogPosts) throw new Error("Failed to fetch blog posts");
 
-      return (
-        data?.[0] || {
-          comments_given: 0,
-          unique_posts_commented: 0,
-          comments_received: 0,
-          is_completed: false,
-          target_posts: [],
-        }
-      );
-    },
-    enabled: !!periodId,
-  });
-};
+      const blogPostIds = blogPosts.map(post => post.id);
+      const myBlogPostIds = blogPosts
+        .filter(post => post.user_id === user.user.id)
+        .map(post => post.id);
 
-// 월별 댓글 통계 조회
-export const useMonthlyCommentStatsQuery = (periodId: string) => {
-  const supabase = createClient();
+      // 2. 댓글 준 개수
+      const { count: commentsGiven } = await supabase
+        .from('comment_records')
+        .select('*', { count: 'exact', head: true })
+        .eq('commenter_id', user.user.id)
+        .in('blog_post_id', blogPostIds);
 
-  return useQuery<MonthlyCommentStats>({
-    queryKey: ["monthly-comment-stats", periodId],
-    queryFn: async () => {
-      const { data: user } = await supabase.auth.getUser();
-      if (!user.user?.id) throw new Error("User not authenticated");
+      // 3. 댓글 받은 개수
+      const { count: commentsReceived } = await supabase
+        .from('comment_records')
+        .select('*', { count: 'exact', head: true })
+        .in('blog_post_id', myBlogPostIds);
 
-      const { data, error } = await supabase
-        .from("view_monthly_comment_stats")
-        .select("*")
-        .eq("user_id", user.user.id)
-        .eq("period_id", periodId)
-        .maybeSingle();
+      // 4. 댓글 단 고유 포스트 수
+      const { data: uniqueComments } = await supabase
+        .from('comment_records')
+        .select('blog_post_id')
+        .eq('commenter_id', user.user.id)
+        .in('blog_post_id', blogPostIds);
 
-      if (error) throw error;
+      const uniquePostsCommented = new Set(
+        uniqueComments?.map(c => c.blog_post_id) || []
+      ).size;
 
-      return (
-        data || {
-          user_id: user.user.id,
-          user_name: "",
-          period_id: periodId,
-          year: new Date().getFullYear(),
-          month: new Date().getMonth() + 1,
-          total_comments_given: 0,
-          unique_posts_commented: 0,
-          total_comments_received: 0,
-          is_completed: false,
-        }
-      );
+      return {
+        comments_given: commentsGiven || 0,
+        unique_posts_commented: uniquePostsCommented,
+        comments_received: commentsReceived || 0,
+        is_completed: (commentsGiven || 0) >= 2, // 또는 다른 조건
+        target_posts: [], // 필요하다면 추가 구현
+      };
     },
     enabled: !!periodId,
   });
@@ -247,7 +237,13 @@ export const useDeleteCommentMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ blogPostId, commenterId }: { blogPostId: string; commenterId: string }) => {
+    mutationFn: async ({
+      blogPostId,
+      commenterId,
+    }: {
+      blogPostId: string;
+      commenterId: string;
+    }) => {
       const { error } = await supabase
         .from("comment_records")
         .delete()
