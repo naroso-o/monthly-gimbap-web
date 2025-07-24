@@ -1,7 +1,7 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
-import { useMemberDashboardQuery } from "@/remote/members";
+import { useMemberDashboardQuery, useMemberOnlineStatusQuery } from "@/remote/members";
 
 interface MemberCardProps {
   userId: string;
@@ -15,6 +15,7 @@ export const MemberCard = ({ userId, userName, periodId }: MemberCardProps) => {
     isLoading,
     error,
   } = useMemberDashboardQuery(userId, periodId);
+  const { data: onlineStatus } = useMemberOnlineStatusQuery(userId);
 
   if (isLoading) {
     return (
@@ -47,38 +48,44 @@ export const MemberCard = ({ userId, userName, periodId }: MemberCardProps) => {
           <span className="text-sm font-medium text-diary-text">
             {member.user_name}
           </span>
-          {member.is_online && (
+          {onlineStatus?.is_online && (
             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
           )}
         </div>
         <div className="grid grid-cols-3 gap-2 text-xs">
-          <span className={`text-center px-2 py-1 rounded font-medium ${
-            member.blog_completed 
-              ? "bg-amber-500 text-white" 
-              : "text-diary-muted"
-          }`}>
+          <span
+            className={`text-center px-2 py-1 rounded font-medium ${
+              member.blog_completed
+                ? "bg-amber-500 text-white"
+                : "text-diary-muted"
+            }`}
+          >
             블로그
           </span>
-          <span className={`text-center px-2 py-1 rounded font-medium ${
-            member.comments_made >= 4 
-              ? "bg-orange-500 text-white" 
-              : member.comments_made >= 2
-              ? "bg-orange-300 text-orange-900"
-              : member.comments_made >= 1
-              ? "bg-orange-200 text-orange-800"
-              : "text-diary-muted"
-          }`}>
+          <span
+            className={`text-center px-2 py-1 rounded font-medium ${
+              member.comments_made >= 4
+                ? "bg-orange-500 text-white"
+                : member.comments_made >= 2
+                ? "bg-orange-300 text-orange-900"
+                : member.comments_made >= 1
+                ? "bg-orange-200 text-orange-800"
+                : "text-diary-muted"
+            }`}
+          >
             댓글
           </span>
-          <span className={`text-center px-2 py-1 rounded font-medium ${
-            member.attendance_days >= 4 
-              ? "bg-stone-600 text-white" 
-              : member.attendance_days >= 2
-              ? "bg-stone-400 text-stone-800"
-              : member.attendance_days >= 1
-              ? "bg-stone-300 text-stone-700"
-              : "text-diary-muted"
-          }`}>
+          <span
+            className={`text-center px-2 py-1 rounded font-medium ${
+              member.attendance_days >= 4
+                ? "bg-stone-600 text-white"
+                : member.attendance_days >= 2
+                ? "bg-stone-400 text-stone-800"
+                : member.attendance_days >= 1
+                ? "bg-stone-300 text-stone-700"
+                : "text-diary-muted"
+            }`}
+          >
             수요일
           </span>
         </div>

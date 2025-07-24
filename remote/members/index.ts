@@ -1,15 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { createClient } from "../../utils/supabase/client";
-import { 
-  useWednesdayAttendanceCount, 
-  useUserCommentsInPeriod, 
-  useUserInfo, 
-  useBlogPostCompletion, 
-  usePeriodInfo, 
-  CommonUser,
+import {
+  useWednesdayAttendanceCount,
+  useUserCommentsInPeriod,
+  useUserInfo,
+  useBlogPostCompletion,
+  usePeriodInfo,
   UserComment,
-  BlogPostCompletion,
-  PeriodInfo
 } from "../common";
 
 // ========================================
@@ -35,29 +32,37 @@ export interface MemberDashboardSummary {
   total_tasks: number;
   completion_rate: number;
   last_activity: string | null;
-  is_online: boolean;
   minutes_since_last_activity: number | null;
   avatar_initial: string;
-  progress_status: 'completed' | 'good' | 'fair' | 'poor';
+  progress_status: "completed" | "good" | "fair" | "poor";
 }
 
 export interface TeamSummaryStats {
   period_id: string;
   total_members: number;
   blog_completed_count: number;
-  avg_completion_rate: number;
-  online_members: number;
-  members_100_percent: number;
-  members_66_to_99_percent: number;
-  members_33_to_65_percent: number;
-  members_below_33_percent: number;
   comments_completed_count: number;
   attendance_completed_count: number;
 }
 
-// ========================================
-// 훅들
-// ========================================
+export const useMemberOnlineStatusQuery = (userId: string) => {
+  const supabase = createClient();
+
+  return useQuery<{ is_online: boolean; minutes_since_last_activity: number }>({
+    queryKey: ["member-online-status", userId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('member_online_stats')
+        .select('is_online, minutes_since_last_activity')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data || { is_online: false, minutes_since_last_activity: null };
+    },
+    refetchInterval: 1000 * 60 * 2, // 2분마다 업데이트
+  });
+};
 
 /**
  * 개별 멤버의 대시보드 정보 조회 (공통 훅 사용)
@@ -87,10 +92,14 @@ export const useMemberDashboardQuery = (userId: string, periodId: string) => {
       const blogCompleted = blogPost?.is_completed || false;
       const commentsMade = comments.length;
       const commentsCompleted = commentsMade >= 4; // 댓글 4개 이상
-      
+
       const attendanceCompleted = wednesdayAttendanceCount >= 1; // 수요일 1회 이상 출석
 
-      const completedTasks = [blogCompleted, commentsCompleted, attendanceCompleted].filter(Boolean).length;
+      const completedTasks = [
+        blogCompleted,
+        commentsCompleted,
+        attendanceCompleted,
+      ].filter(Boolean).length;
       const totalTasks = 3;
       const completionRate = Math.round((completedTasks / totalTasks) * 100);
 
@@ -99,10 +108,14 @@ export const useMemberDashboardQuery = (userId: string, periodId: string) => {
         0 // 수요일 출석은 시간 정보가 없으므로 제외
       );
 
-      const progressStatus = 
-        completionRate === 100 ? 'completed' :
-        completionRate >= 66 ? 'good' :
-        completionRate >= 33 ? 'fair' : 'poor';
+      const progressStatus =
+        completionRate === 100
+          ? "completed"
+          : completionRate >= 66
+          ? "good"
+          : completionRate >= 33
+          ? "fair"
+          : "poor";
 
       return {
         user_id: user.id,
@@ -122,13 +135,18 @@ export const useMemberDashboardQuery = (userId: string, periodId: string) => {
         completed_tasks: completedTasks,
         total_tasks: totalTasks,
         completion_rate: completionRate,
-        last_activity: lastActivity > 0 ? new Date(lastActivity).toISOString() : null,
-        is_online: false, // 온라인 상태는 별도 처리
-        minutes_since_last_activity: lastActivity > 0 
-          ? Math.floor((Date.now() - lastActivity) / (1000 * 60))
-          : null,
+        last_activity:
+          lastActivity > 0 ? new Date(lastActivity).toISOString() : null,
+        minutes_since_last_activity:
+          lastActivity > 0
+            ? Math.floor((Date.now() - lastActivity) / (1000 * 60))
+            : null,
         avatar_initial: user.name.charAt(0),
-        progress_status: progressStatus as 'completed' | 'good' | 'fair' | 'poor'
+        progress_status: progressStatus as
+          | "completed"
+          | "good"
+          | "fair"
+          | "poor",
       } as MemberDashboardSummary;
     },
     enabled: !!(userId && periodId && userInfoQuery.data && periodQuery.data),
@@ -142,13 +160,15 @@ export const useMemberDashboardQuery = (userId: string, periodId: string) => {
 export const useAllUsersQuery = () => {
   const supabase = createClient();
 
-  return useQuery<{ id: string; name: string; email: string; is_admin: boolean }[]>({
+  return useQuery<
+    { id: string; name: string; email: string; is_admin: boolean }[]
+  >({
     queryKey: ["all-users"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('users')
-        .select('id, name, email, is_admin')
-        .order('name');
+        .from("users")
+        .select("id, name, email, is_admin")
+        .order("name");
 
       if (error) throw error;
       return data || [];
@@ -167,27 +187,23 @@ export const useTeamSummaryStatsQuery = (periodId: string) => {
     queryKey: ["team-summary-stats", periodId],
     queryFn: async () => {
       // 간단한 집계만 수행
-      const [usersRes, blogPostsRes, commentsRes, attendanceRes] = await Promise.all([
-        supabase.from('users').select('id', { count: 'exact', head: true }),
-        supabase.from('blog_posts').select('user_id', { count: 'exact', head: true }).eq('period_id', periodId),
-        supabase.from('comment_records').select('commenter_id'),
-        supabase.from('attendance_records').select('user_id').eq('period_id', periodId)
-      ]);
+      const [usersRes, blogPostsRes] =
+        await Promise.all([
+          supabase.from("users").select("id", { count: "exact", head: true }),
+          supabase.from("blog_posts").select("user_id", {
+            count: "exact",
+            head: true,
+          }),
+        ]);
 
       const totalMembers = usersRes.count || 0;
       const blogCompletedCount = blogPostsRes.count || 0;
-      
+
       // 간단한 통계만 반환
       return {
         period_id: periodId,
         total_members: totalMembers,
         blog_completed_count: blogCompletedCount,
-        avg_completion_rate: 0, 
-        online_members: 0,
-        members_100_percent: 0,
-        members_66_to_99_percent: 0,
-        members_33_to_65_percent: 0,
-        members_below_33_percent: 0,
         comments_completed_count: 0,
         attendance_completed_count: 0,
       } as TeamSummaryStats;
