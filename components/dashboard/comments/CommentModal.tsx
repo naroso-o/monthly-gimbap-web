@@ -63,23 +63,9 @@ export const CommentModal = () => {
         <DialogClose onClick={handleClose} />
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            {userCommentStatus?.is_completed ? (
-              <>
-                <CheckCircle2 className="w-5 h-5 text-diary-accent" />
-                댓글 활동 완료!
-              </>
-            ) : (
-              <>
-                <MessageCircle className="w-5 h-5 text-diary-muted" />
-                댓글 활동 체크
-              </>
-            )}
+            <MessageCircle className="w-5 h-5 text-diary-muted" />
+            댓글 활동 체크
           </DialogTitle>
-          <DialogDescription>
-            {userCommentStatus?.is_completed
-              ? `이번 달 댓글 활동을 완료하셨습니다! (${uniqueAuthorsCommented}명/${totalAuthors}명) 🎉`
-              : `멤버들의 블로그 글에 댓글을 달고 체크해주세요. (현재 ${uniqueAuthorsCommented}명/${totalAuthors}명)`}
-          </DialogDescription>
         </DialogHeader>
 
         <div className="p-6 pt-0 space-y-4">
@@ -168,18 +154,6 @@ export const CommentModal = () => {
                   );
                 })}
               </div>
-            </div>
-          )}
-
-          {/* 완료 상태 메시지 */}
-          {userCommentStatus?.is_completed && (
-            <div className="text-center p-4 bg-green-50 border border-green-200 rounded-lg">
-              <CheckCircle2 className="w-8 h-8 text-green-600 mx-auto mb-2" />
-              <p className="text-green-700 font-medium mb-1">댓글 활동 완료!</p>
-              <p className="text-green-600 text-sm">
-                {userCommentStatus.unique_posts_commented}개의 포스트에 댓글을
-                달아주셨어요. 활발한 소통 감사합니다! 🎉
-              </p>
             </div>
           )}
 
