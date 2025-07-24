@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "../../utils/supabase/client";
+import { UserComment } from "../common";
 
 export interface CommentRecord {
   id: string;
@@ -72,48 +73,40 @@ export const useUserCommentStatusQuery = (periodId: string) => {
       const { data: user } = await supabase.auth.getUser();
       if (!user.user?.id) throw new Error("User not authenticated");
 
-      // 1. 먼저 해당 period의 blog_posts ID들을 가져옴
+      // 공통 RPC 함수를 사용하여 댓글 데이터 조회
+      const { data: userComments, error: commentsError } = await supabase.rpc(
+        "get_user_comments_in_period",
+        {
+          p_user_id: user.user.id,
+          p_period_id: periodId,
+        }
+      );
+
+      if (commentsError) throw commentsError;
+
+      const comments: UserComment[] = userComments || [];
+      const commentsGiven = comments.length;
+      const uniquePostsCommented = new Set(comments.map((c: UserComment) => c.blog_post_id)).size;
+
+      // 댓글 받은 개수는 별도 계산 (내 포스트에 달린 댓글)
       const { data: blogPosts } = await supabase
         .from('blog_posts')
-        .select('id, user_id')
+        .select('id')
+        .eq('user_id', user.user.id)
         .eq('period_id', periodId);
 
-      if (!blogPosts) throw new Error("Failed to fetch blog posts");
+      const myBlogPostIds = blogPosts?.map(post => post.id) || [];
 
-      const blogPostIds = blogPosts.map(post => post.id);
-      const myBlogPostIds = blogPosts
-        .filter(post => post.user_id === user.user.id)
-        .map(post => post.id);
-
-      // 2. 댓글 준 개수
-      const { count: commentsGiven } = await supabase
-        .from('comment_records')
-        .select('*', { count: 'exact', head: true })
-        .eq('commenter_id', user.user.id)
-        .in('blog_post_id', blogPostIds);
-
-      // 3. 댓글 받은 개수
       const { count: commentsReceived } = await supabase
         .from('comment_records')
         .select('*', { count: 'exact', head: true })
         .in('blog_post_id', myBlogPostIds);
 
-      // 4. 댓글 단 고유 포스트 수
-      const { data: uniqueComments } = await supabase
-        .from('comment_records')
-        .select('blog_post_id')
-        .eq('commenter_id', user.user.id)
-        .in('blog_post_id', blogPostIds);
-
-      const uniquePostsCommented = new Set(
-        uniqueComments?.map(c => c.blog_post_id) || []
-      ).size;
-
       return {
-        comments_given: commentsGiven || 0,
+        comments_given: commentsGiven,
         unique_posts_commented: uniquePostsCommented,
         comments_received: commentsReceived || 0,
-        is_completed: (commentsGiven || 0) >= 2, // 또는 다른 조건
+        is_completed: commentsGiven >= 2, // 또는 다른 조건
         target_posts: [], // 필요하다면 추가 구현
       };
     },

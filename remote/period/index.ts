@@ -2,6 +2,7 @@
 import { createClient } from "@/utils/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "../keys";
+import { usePeriodInfo } from "../common";
 
 export interface MonthlyPeriod {
   id: string;
@@ -61,23 +62,24 @@ export const useAllPeriodsQuery = () => {
 };
 
 /**
- * 특정 기간 정보 조회
+ * 특정 기간 정보 조회 (공통 훅 사용)
  */
 export const usePeriodQuery = (periodId: string) => {
-  const supabase = createClient();
+  // 공통 훅을 사용하되, 기존 인터페이스 호환성을 위해 래퍼 형태로 제공
+  const periodInfoQuery = usePeriodInfo(periodId);
 
   return useQuery<MonthlyPeriod | null>({
     queryKey: ['period', periodId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('monthly_periods')
-        .select('*')
-        .eq('id', periodId)
-        .maybeSingle();
+      const periodInfo = periodInfoQuery.data;
+      if (!periodInfo) return null;
 
-      if (error) throw error;
-      return data;
+      // MonthlyPeriod 인터페이스에 맞게 변환 (created_at 필드 추가 필요시)
+      return {
+        ...periodInfo,
+        created_at: '', // 공통 훅에서는 제공하지 않음, 필요시 별도 조회
+      } as MonthlyPeriod;
     },
-    enabled: !!periodId,
+    enabled: !!periodId && !!periodInfoQuery.data,
   });
 };

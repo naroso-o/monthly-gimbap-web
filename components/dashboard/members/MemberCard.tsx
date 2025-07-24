@@ -1,81 +1,86 @@
 "use client";
 
-import { CheckCircle2, Circle } from "lucide-react";
-import { useUserInfoQuery } from "@/remote/users";
-import { MemberDashboardSummary } from "@/remote/members";
-import { 
-  getCompletionColor, 
-  formatLastActivity, 
-  getMemberStatusText 
-} from "@/utils/members";
+import { Loader2 } from "lucide-react";
+import { useMemberDashboardQuery } from "@/remote/members";
 
 interface MemberCardProps {
-  member: MemberDashboardSummary;
+  userId: string;
+  userName: string;
+  periodId: string;
 }
 
-export const MemberCard = ({ member }: MemberCardProps) => {
-  // 실제 사용자 정보 조회
-  const { data: userInfo, isLoading: userLoading } = useUserInfoQuery(member.user_id);
+export const MemberCard = ({ userId, userName, periodId }: MemberCardProps) => {
+  const {
+    data: member,
+    isLoading,
+    error,
+  } = useMemberDashboardQuery(userId, periodId);
 
-  // 사용자 정보가 로딩 중이면 기본값 사용
-  const displayName = userLoading 
-    ? "로딩중..." 
-    : userInfo?.name || member.user_name || "알 수 없음";
-    
-  const avatarInitial = userLoading 
-    ? "?" 
-    : (userInfo?.name || member.user_name)?.charAt(0) || "?";
+  if (isLoading) {
+    return (
+      <div className="p-3 bg-diary-card border border-diary-border rounded-lg">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-sm font-medium text-diary-text">
+            {userName}
+          </span>
+          <Loader2 className="w-3 h-3 animate-spin text-diary-muted" />
+        </div>
+        <div className="h-1.5 bg-diary-border rounded-full animate-pulse mb-2"></div>
+        <div className="text-xs text-diary-muted">로딩 중...</div>
+      </div>
+    );
+  }
+
+  if (error || !member) {
+    return (
+      <div className="p-3 bg-diary-card border border-diary-border rounded-lg opacity-50">
+        <span className="text-sm text-diary-muted">{userName} - 로딩 실패</span>
+      </div>
+    );
+  }
 
   return (
-    <div
-      className="flex items-center justify-between p-2 rounded-lg hover:bg-diary-border/20"
-      title={getMemberStatusText(member)}
-    >
-      <div className="flex items-center gap-3 flex-1">
-        {/* 온라인 상태 표시 */}
-        <div className="relative">
-          <div className="w-8 h-8 rounded-full bg-diary-border flex items-center justify-center">
-            <span className="text-xs font-medium text-diary-text">
-              {avatarInitial}
-            </span>
-          </div>
-          <div
-            className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-diary-card ${
-              member.is_online ? "bg-green-500" : "bg-diary-muted"
-            }`}
-            title={
-              member.is_online
-                ? "온라인"
-                : `${formatLastActivity(member.last_activity)} 활동`
-            }
-          />
+    <div className="p-3 bg-diary-card border border-diary-border rounded-lg hover:bg-diary-border/10 transition-colors">
+      {/* 상단: 이름과 완료율 */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-diary-text">
+            {member.user_name}
+          </span>
+          {member.is_online && (
+            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+          )}
         </div>
-
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-sm font-medium text-diary-text truncate">
-              {displayName}
-            </span>
-            {member.completed_tasks === member.total_tasks ? (
-              <CheckCircle2 className="w-3 h-3 text-diary-accent flex-shrink-0" />
-            ) : (
-              <Circle className="w-3 h-3 text-diary-muted flex-shrink-0" />
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="flex-1 bg-diary-border rounded-full h-1.5">
-              <div
-                className="h-1.5 rounded-full transition-all duration-300"
-                style={{
-                  width: `${member.completion_rate}%`,
-                  backgroundColor: getCompletionColor(member.completion_rate),
-                }}
-              />
-            </div>
-            <span className="text-xs text-diary-muted flex-shrink-0">
-              {member.completed_tasks}/{member.total_tasks}
-            </span>
-          </div>
+        <div className="grid grid-cols-3 gap-2 text-xs">
+          <span className={`text-center px-2 py-1 rounded font-medium ${
+            member.blog_completed 
+              ? "bg-amber-500 text-white" 
+              : "text-diary-muted"
+          }`}>
+            블로그
+          </span>
+          <span className={`text-center px-2 py-1 rounded font-medium ${
+            member.comments_made >= 4 
+              ? "bg-orange-500 text-white" 
+              : member.comments_made >= 2
+              ? "bg-orange-300 text-orange-900"
+              : member.comments_made >= 1
+              ? "bg-orange-200 text-orange-800"
+              : "text-diary-muted"
+          }`}>
+            댓글
+          </span>
+          <span className={`text-center px-2 py-1 rounded font-medium ${
+            member.attendance_days >= 4 
+              ? "bg-stone-600 text-white" 
+              : member.attendance_days >= 2
+              ? "bg-stone-400 text-stone-800"
+              : member.attendance_days >= 1
+              ? "bg-stone-300 text-stone-700"
+              : "text-diary-muted"
+          }`}>
+            수요일
+          </span>
         </div>
       </div>
     </div>

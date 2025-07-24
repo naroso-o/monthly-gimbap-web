@@ -2,6 +2,7 @@ import { createClient } from "@/utils/supabase/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useUserQuery } from "../users";
 import { useCurrentPeriodQuery } from "../period";
+import { useBlogPostCompletion } from "../common";
 
 export interface BlogPost {
   id: string;
@@ -17,38 +18,31 @@ export interface CreatePost {
   issueUrl: string;
 }
 
-// 블로그 포스트 완료 여부를 확인하는 쿼리 (기존 useBlogPostCheckQuery 대체)
+// 블로그 포스트 완료 여부를 확인하는 쿼리 (공통 훅 사용)
 export const useBlogPostCheckQuery = (periodId: string) => {
-  const supabase = createClient();
   const { data: user } = useUserQuery();
+  
+  // 공통 훅을 사용하되, 기존 인터페이스 호환성을 위해 래퍼 형태로 제공
+  const blogCompletionQuery = useBlogPostCompletion(user?.id || '', periodId);
 
   return useQuery({
     queryKey: ["blog_post_check", periodId, user?.id],
     queryFn: async () => {
-      if (!user) return null;
+      if (!user || !blogCompletionQuery.data) return null;
 
-      const { data, error } = await supabase
-        .from("blog_posts")
-        .select("*")
-        .eq("user_id", user.id)
-        .eq("period_id", periodId)
-        .maybeSingle();
-
-      if (error) throw error;
-
-      // 블로그 포스트가 존재하면 완료된 것으로 간주
+      const completion = blogCompletionQuery.data;
       return {
-        id: data?.id || null,
+        id: completion.id,
         user_id: user.id,
         period_id: periodId,
-        is_completed: !!data,
-        github_issue_url: data?.github_issue_url,
-        completed_at: data?.submitted_at,
-        created_at: data?.created_at,
-        updated_at: data?.updated_at,
+        is_completed: completion.is_completed,
+        github_issue_url: completion.github_issue_url,
+        completed_at: completion.submitted_at,
+        created_at: null, // 공통 훅에서는 제공하지 않음
+        updated_at: null, // 공통 훅에서는 제공하지 않음
       };
     },
-    enabled: !!periodId && !!user,
+    enabled: !!periodId && !!user && !!blogCompletionQuery.data,
   });
 };
 

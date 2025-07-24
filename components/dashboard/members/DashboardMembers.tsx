@@ -3,15 +3,12 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Loader2 } from "lucide-react";
-import {
-  useMemberDashboardSummaryQuery,
-  useTeamSummaryStatsQuery,
-} from "@/remote/members";
+import { useAllUsersQuery, useTeamSummaryStatsQuery } from "@/remote/members";
 import { useCurrentPeriodQuery } from "@/remote/period";
 import { MemberCard } from "./MemberCard";
 
 interface DashboardMembersProps {
-  periodId?: string; // optional로 변경
+  periodId?: string;
 }
 
 export const DashboardMembers = ({ periodId }: DashboardMembersProps) => {
@@ -22,11 +19,13 @@ export const DashboardMembers = ({ periodId }: DashboardMembersProps) => {
   // periodId가 전달되면 그것을 사용, 아니면 현재 기간 사용
   const activePeriodId = periodId || currentPeriod?.id;
 
+  // 모든 사용자 목록만 가져오기
   const {
-    data: members,
-    isLoading: membersLoading,
-    error: membersError,
-  } = useMemberDashboardSummaryQuery(activePeriodId || "");
+    data: users,
+    isLoading: usersLoading,
+    error: usersError,
+  } = useAllUsersQuery();
+
   const { data: teamStats, isLoading: statsLoading } = useTeamSummaryStatsQuery(
     activePeriodId || ""
   );
@@ -63,14 +62,14 @@ export const DashboardMembers = ({ periodId }: DashboardMembersProps) => {
     );
   }
 
-  // 멤버 데이터 로딩 중
-  if (membersLoading) {
+  // 사용자 목록 로딩 중
+  if (usersLoading) {
     return (
       <Card className="h-full">
         <CardContent className="p-4 h-full flex items-center justify-center">
           <div className="flex items-center gap-2 text-diary-muted">
             <Loader2 className="w-4 h-4 animate-spin" />
-            <span className="text-sm">멤버 현황을 불러오는 중...</span>
+            <span className="text-sm">멤버 목록을 불러오는 중...</span>
           </div>
         </CardContent>
       </Card>
@@ -78,18 +77,15 @@ export const DashboardMembers = ({ periodId }: DashboardMembersProps) => {
   }
 
   // 에러 상태
-  if (membersError) {
+  if (usersError) {
     return (
       <Card className="h-full">
         <CardContent className="p-4 h-full flex flex-col items-center justify-center">
           <div className="text-red-600 text-sm mb-2">
-            멤버 현황을 불러오는데 실패했습니다.
-          </div>
-          <div className="text-xs text-diary-muted">
-            Period ID: {activePeriodId}
+            멤버 목록을 불러오는데 실패했습니다.
           </div>
           <div className="text-xs text-diary-muted break-all">
-            {membersError.message}
+            {usersError.message}
           </div>
         </CardContent>
       </Card>
@@ -97,7 +93,7 @@ export const DashboardMembers = ({ periodId }: DashboardMembersProps) => {
   }
 
   // 데이터가 없는 경우
-  if (!members || members.length === 0) {
+  if (!users || users.length === 0) {
     return (
       <Card className="h-full">
         <CardContent className="p-4 h-full flex flex-col items-center justify-center">
@@ -110,9 +106,6 @@ export const DashboardMembers = ({ periodId }: DashboardMembersProps) => {
               ? `${currentPeriod.year}년 ${currentPeriod.month}월`
               : "알 수 없음"}
           </div>
-          <div className="text-xs text-diary-muted">
-            Period ID: {activePeriodId}
-          </div>
         </CardContent>
       </Card>
     );
@@ -124,7 +117,7 @@ export const DashboardMembers = ({ periodId }: DashboardMembersProps) => {
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-medium text-diary-text text-sm">멤버 현황</h3>
           <Badge variant="outline" className="text-xs">
-            {members.length}명
+            {users.length}명
           </Badge>
         </div>
 
@@ -135,28 +128,86 @@ export const DashboardMembers = ({ periodId }: DashboardMembersProps) => {
           </div>
         )}
 
+        {/* 컬러 범례 */}
+        <div className="flex items-center gap-4 whitespace-nowrap min-w-max mb-3">
+          {/* 블로그 */}
+          <div className="flex items-center gap-1">
+            <span className="text-xs text-diary-text">블로그:</span>
+            <div className="flex items-center">
+              <div className="w-12 h-4 bg-amber-500 rounded text-xs flex items-center justify-center">
+                <span className="text-white text-[10px] font-medium">완료</span>
+              </div>
+            </div>
+
+            {/* 댓글 */}
+            <div className="flex items-center gap-1">
+              <span className="text-xs text-diary-muted">댓글:</span>
+              <div className="flex items-center gap-0.5">
+                <div className="w-8 h-4 bg-orange-200 rounded text-xs flex items-center justify-center">
+                  <span className="text-orange-800 text-[10px] font-medium">
+                    1+
+                  </span>
+                </div>
+                <div className="w-8 h-4 bg-orange-300 rounded text-xs flex items-center justify-center">
+                  <span className="text-orange-900 text-[10px] font-medium">
+                    2+
+                  </span>
+                </div>
+                <div className="w-8 h-4 bg-orange-500 rounded text-xs flex items-center justify-center">
+                  <span className="text-white text-[10px] font-medium">4+</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 수요일 */}
+            <div className="flex items-center gap-1">
+              <span className="text-xs text-diary-muted">수요일:</span>
+              <div className="flex items-center gap-0.5">
+                <div className="w-8 h-4 bg-stone-300 rounded text-xs flex items-center justify-center">
+                  <span className="text-stone-700 text-[10px] font-medium">
+                    1+
+                  </span>
+                </div>
+                <div className="w-8 h-4 bg-stone-400 rounded text-xs flex items-center justify-center">
+                  <span className="text-stone-800 text-[10px] font-medium">
+                    2+
+                  </span>
+                </div>
+                <div className="w-8 h-4 bg-stone-600 rounded text-xs flex items-center justify-center">
+                  <span className="text-white text-[10px] font-medium">4+</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="flex-1 overflow-y-auto space-y-3">
-          {members.map((member) => (
-            <MemberCard key={member.user_id} member={member} />
+          {users.map((user) => (
+            <MemberCard
+              key={user.id}
+              userId={user.id}
+              userName={user.name}
+              periodId={activePeriodId}
+            />
           ))}
         </div>
 
         {/* 하단 요약 */}
         <div className="mt-4 pt-3 border-t border-diary-border">
           <div className="flex justify-between text-xs">
-            <span className="text-diary-muted">완료율 평균</span>
+            <span className="text-diary-muted">등록된 멤버</span>
+            <span className="text-diary-text font-medium">
+              {users.length}명
+            </span>
+          </div>
+          <div className="flex justify-between text-xs mt-1">
+            <span className="text-diary-muted">블로그 제출</span>
             <span className="text-diary-text font-medium">
               {statsLoading ? (
                 <Loader2 className="w-3 h-3 animate-spin" />
               ) : (
-                `${teamStats?.avg_completion_rate || 0}%`
+                `${teamStats?.blog_completed_count || 0}명`
               )}
-            </span>
-          </div>
-          <div className="flex justify-between text-xs mt-1">
-            <span className="text-diary-muted">온라인 멤버</span>
-            <span className="text-diary-text font-medium">
-              {members.filter((member) => member.is_online).length}명
             </span>
           </div>
         </div>

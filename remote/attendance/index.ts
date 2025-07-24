@@ -87,30 +87,8 @@ export const useAttendanceCheckQuery = (periodId: string) => {
   });
 };
 
-// 수요일 출석 횟수 쿼리
-export const useWednesdayAttendanceQuery = (periodId: string) => {
-  const supabase = createClient();
-
-  return useQuery<number>({
-    queryKey: ["wednesday-attendance", periodId],
-    queryFn: async () => {
-      const { data: user } = await supabase.auth.getUser();
-      if (!user.user?.id) throw new Error("User not authenticated");
-
-      const { data, error } = await supabase.rpc(
-        "get_wednesday_attendance_count",
-        {
-          p_user_id: user.user.id,
-          p_period_id: periodId,
-        }
-      );
-
-      if (error) throw error;
-      return data || 0;
-    },
-    enabled: !!periodId,
-  });
-};
+// 수요일 출석 횟수 쿼리는 공통 훅(../common.ts)을 사용하세요
+// import { useWednesdayAttendanceCount, useCurrentUserId } from "../common";
 
 // 캘린더용 일별 통계 쿼리
 export const useDailyAttendanceStatsQuery = (periodId: string) => {
