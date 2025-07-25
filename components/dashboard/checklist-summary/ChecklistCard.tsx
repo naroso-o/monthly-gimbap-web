@@ -3,9 +3,9 @@ import {
   Card,
   CardContent,
   CardFooter,
-} from "../ui/card";
+} from "../../ui/card";
 
-interface DashboardCardProps {
+interface ChecklistCardProps {
   title: string;
   icon: React.ReactNode;
   description: string;
@@ -15,7 +15,7 @@ interface DashboardCardProps {
   targetProgress?: number;
 }
 
-export const DashboardCard = ({
+export const ChecklistCard = ({
   title,
   icon,
   description,
@@ -23,7 +23,7 @@ export const DashboardCard = ({
   button,
   progress,
   targetProgress,
-}: DashboardCardProps) => {
+}: ChecklistCardProps) => {
   return (
     <Card className="bg-white border border-stone-200 shadow-sm">
       <CardContent className="h-full flex flex-col gap-3">

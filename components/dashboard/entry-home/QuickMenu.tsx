@@ -1,7 +1,7 @@
 "use client";
 
 import { ExternalLink, MessageSquare, Users, FileText } from "lucide-react";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 
 const quickMenuItems = [
   {
@@ -30,7 +30,7 @@ const quickMenuItems = [
   },
 ];
 
-export const DashboardQuickMenu = () => {
+export const QuickMenu = () => {
   const handleMenuClick = (url: string) => {
     window.open(url, "_blank", "noopener,noreferrer");
   };

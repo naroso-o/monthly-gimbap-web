@@ -1,4 +1,4 @@
-export function DashboardCalendarLegends() {
+export function CalendarLegends() {
   return (
     <div className="flex items-center gap-2 text-xs text-diary-muted">
       <div className="flex items-center gap-1">

@@ -8,7 +8,7 @@ import {
 } from "@/remote/comments";
 import { useState } from "react";
 
-export const AvailablePostCard = ({ post }: { post: ExtendedBlogPost }) => {
+export const CommentablePost = ({ post }: { post: ExtendedBlogPost }) => {
   const { data: user } = useUserInfoQuery(post.user_id);
   const { mutate: createComment } = useCreateCommentMutation();
   const { mutate: deleteComment } = useDeleteCommentMutation();

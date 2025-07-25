@@ -1,16 +1,12 @@
 "use client";
-import { useCurrentPeriodQuery } from "@/remote/period";
-import { Dashboard } from "./Dashboard";
-import { DashboardCalendar } from "./DashboardCalendar";
-import { DashboardHeader } from "./DashboardHeader";
-import { DashboardMembers } from "./members/DashboardMembers";
-import { DashboardQuickMenu } from "./DashboardQuickMenu";
+import { ChecklistSummaryContainer } from "./checklist-summary/ChecklistSummaryContainer";
+import { AttendanceCalendar } from "./attendance-summary/AttendanceCalendar";
+import { EntryHeader } from "./entry-home/EntryHeader";
+import { AttendanceMembers } from "./attendance-summary/AttendanceMembers";
 import { useEffect, useRef, useState, useMemo } from "react";
+import { QuickMenu } from "./entry-home/QuickMenu";
 
 export const DashboardSection = () => {
-  const { data: currentPeriod } = useCurrentPeriodQuery();
-
-  // 각 섹션에 대한 ref
   const headerSectionRef = useRef<HTMLDivElement>(null);
   const dashboardSectionRef = useRef<HTMLDivElement>(null);
   const bottomSectionRef = useRef<HTMLDivElement>(null);
@@ -49,10 +45,10 @@ export const DashboardSection = () => {
 
       let nextSection = currentSection;
 
-      if (e.deltaY > 0 && currentSection < sections.length - 1) {
+      if (e.deltaY > 20 && currentSection < sections.length - 1) {
         // 아래로 스크롤
         nextSection = currentSection + 1;
-      } else if (e.deltaY < 0 && currentSection > 0) {
+      } else if (e.deltaY < -20 && currentSection > 0) {
         // 위로 스크롤
         nextSection = currentSection - 1;
       }
@@ -130,8 +126,8 @@ export const DashboardSection = () => {
           } flex flex-col justify-center p-4`}
         >
           <div className="flex flex-col gap-4">
-            <DashboardHeader />
-            <DashboardQuickMenu />
+            <EntryHeader />
+            <QuickMenu />
           </div>
         </div>
 
@@ -142,7 +138,7 @@ export const DashboardSection = () => {
             isMobile ? "min-h-screen py-8" : "min-h-screen"
           } flex flex-col justify-center p-4`}
         >
-          <Dashboard periodId={currentPeriod?.id || ""} />
+          <ChecklistSummaryContainer />
         </div>
 
         {/* 세 번째 섹션: Calendar + Members */}
@@ -153,8 +149,8 @@ export const DashboardSection = () => {
           } flex flex-col justify-center p-4`}
         >
           <div className="w-full grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <DashboardCalendar periodId={currentPeriod?.id || ""} />
-            <DashboardMembers />
+            <AttendanceCalendar />
+            <AttendanceMembers />
           </div>
         </div>
 

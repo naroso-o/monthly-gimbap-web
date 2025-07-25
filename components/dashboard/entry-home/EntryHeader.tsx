@@ -1,12 +1,12 @@
 "use client";
 
-import { GimbapIcon } from "../icon/GimbapIcon";
+import { GimbapIcon } from "@/components/icon/GimbapIcon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useUser } from "@/hooks/useUser";
-import { useCurrentPeriodQuery } from "@/remote/period";
+import { usePeriodStore } from "../../../stores/usePeriodStore";
 
-export const DashboardHeader = () => {
+export const EntryHeader = () => {
   const {
     user,
     isLoading,
@@ -18,20 +18,7 @@ export const DashboardHeader = () => {
     handleUpdateName,
     handleCancel,
   } = useUser();
-  const { data: currentPeriod } = useCurrentPeriodQuery();
-
-  if (isLoading) {
-    return (
-      <div className="mb-6 pt-4">
-        <div className="text-center space-y-2">
-          <div className="flex justify-center mb-4">
-            <GimbapIcon className="w-12 h-12" />
-          </div>
-          <div className="h-6 bg-gray-200 rounded animate-pulse w-48 mx-auto"></div>
-        </div>
-      </div>
-    );
-  }
+  const { period } = usePeriodStore();
 
   return (
     <div className="mb-6 pt-4">
@@ -43,7 +30,9 @@ export const DashboardHeader = () => {
           className="text-xl font-medium text-stone-700"
           style={{ fontFamily: "Georgia, serif" }}
         >
-          {user ? (
+          {isLoading ? (
+            <div className="h-6 bg-gray-200 rounded animate-pulse w-48 mx-auto"></div>
+          ) : user ? (
             <>
               {isEditingName ? (
                 <div className="flex items-center justify-center gap-2 mt-2">
@@ -91,7 +80,7 @@ export const DashboardHeader = () => {
           )}
         </h1>
         <p className="text-sm text-stone-600">
-          {currentPeriod?.start_date} ~ {currentPeriod?.end_date}
+          {period?.start_date} ~ {period?.end_date}
         </p>
       </div>
     </div>

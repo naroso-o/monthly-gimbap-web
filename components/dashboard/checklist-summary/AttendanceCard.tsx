@@ -1,15 +1,17 @@
 import { Calendar } from "lucide-react";
 import { useAttendanceCheckQuery } from "@/remote/attendance";
-import { DashboardCard } from "../DashboardCard";
+import { ChecklistCard } from "./ChecklistCard";
 import { Button } from "../../ui/button";
 import { useModalStore } from "@/stores/useModalStore";
+import { usePeriodStore } from "../../../stores/usePeriodStore";
 
-export const DashboardAttendanceCard = ({ periodId }: { periodId: string }) => {
+export const AttendanceCard = () => {
   const { setAttendanceModalOpen } = useModalStore();
-  const { data: attendanceChecklist } = useAttendanceCheckQuery(periodId);
+  const { period } = usePeriodStore();
+  const { data: attendanceChecklist } = useAttendanceCheckQuery(period?.id || "");
 
   return (
-    <DashboardCard
+    <ChecklistCard
       title="출석"
       icon={<Calendar className="w-5 h-5 text-stone-600" />}
       description={`월 2회 이상 수요일 정기모임 출석 (${

@@ -16,7 +16,7 @@ import {
   useDailyAttendanceSummaryQuery,
   useAttendanceStatusQuery,
 } from "@/remote/attendance";
-import { useCurrentPeriodQuery } from "@/remote/period";
+import { usePeriodStore } from "../../../stores/usePeriodStore";
 
 export const AttendanceModal = () => {
   const now = new Date();
@@ -26,7 +26,7 @@ export const AttendanceModal = () => {
   const { data: dailyAttendanceSummary } =
     useDailyAttendanceSummaryQuery(today);
   const { data: attendanceStatus } = useAttendanceStatusQuery(today);
-  const { data: period } = useCurrentPeriodQuery();
+  const { period } = usePeriodStore();
   const { mutate: submitAttendance } = useAttendanceMutation();
 
   const { attendanceModalOpen, setAttendanceModalOpen } = useModalStore();
@@ -139,7 +139,8 @@ export const AttendanceModal = () => {
               )}
             </div>
             <p className="text-xs text-diary-muted">
-              현재 시간: {currentTime.toLocaleTimeString("ko-KR", {
+              현재 시간:{" "}
+              {currentTime.toLocaleTimeString("ko-KR", {
                 hour: "2-digit",
                 minute: "2-digit",
                 second: "2-digit",

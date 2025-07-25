@@ -1,6 +1,6 @@
 import { formatDuration } from "@/utils/calendar";
 
-export function DashboardCalendarSummary({
+export function CalendarSummary({
   totalAttendanceDays,
   avgMinutes,
 }: {

@@ -1,15 +1,17 @@
 import { MessageCircle } from "lucide-react";
-import { DashboardCard } from "../DashboardCard";
+import { ChecklistCard } from "./ChecklistCard";
 import { Button } from "@/components/ui/button";
 import { useUserCommentStatusQuery } from "@/remote/comments";
 import { useModalStore } from "@/stores/useModalStore";
+import { usePeriodStore } from "../../../stores/usePeriodStore";
 
-export const DashboardCommentsCard = ({ periodId }: { periodId: string }) => {
+export const CommentsCard = () => {
   const { setCommentModalOpen } = useModalStore();
-  const { data: userCommentStatus } = useUserCommentStatusQuery(periodId);
+  const { period } = usePeriodStore();
+  const { data: userCommentStatus } = useUserCommentStatusQuery(period?.id || "");
 
   return (
-    <DashboardCard
+    <ChecklistCard
       title="댓글 활동"
       icon={<MessageCircle className="w-5 h-5 text-stone-600" />}
       description={`월 4명 이상에게 댓글 달기 (${userCommentStatus?.comments_given || 0}/4)`}

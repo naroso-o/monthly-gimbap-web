@@ -1,8 +1,20 @@
 "use client";
+import { useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { Button } from "@/components/ui/button";
+import { usePeriodStore } from "@/stores/usePeriodStore";
+import { useCurrentPeriodQuery } from "@/remote/period";
 
 export const Header = () => {
+  const { setPeriod } = usePeriodStore();
+  const { data: currentPeriod } = useCurrentPeriodQuery();
+  
+  useEffect(() => {
+    if (currentPeriod) {
+      setPeriod({...currentPeriod, month: currentPeriod.month - 1});
+    }
+  }, [currentPeriod, setPeriod]);
+
   const handleSignOut = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();

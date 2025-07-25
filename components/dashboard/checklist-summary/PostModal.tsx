@@ -16,14 +16,14 @@ import { Input } from "@/components/ui/input";
 import { ExternalLink, CheckCircle2 } from "lucide-react";
 import { useModalStore } from "@/stores/useModalStore";
 import { useCreatePostMutation, useBlogPostCheckQuery } from "@/remote/blog";
-import { useCurrentPeriodQuery } from "@/remote/period";
+import { usePeriodStore } from "../../../stores/usePeriodStore";
 
-export function PostSubmitModal() {
+export const PostModal = () => {
   const { postSubmitModalOpen, setPostSubmitModalOpen } = useModalStore();
   const { mutate: createPost } = useCreatePostMutation();
-  const { data: currentPeriod } = useCurrentPeriodQuery();
+  const { period } = usePeriodStore();
   const { data: blogPostCheck } = useBlogPostCheckQuery(
-    currentPeriod?.id || ""
+    period?.id || ""
   );
 
   const [issueUrl, setIssueUrl] = useState("");

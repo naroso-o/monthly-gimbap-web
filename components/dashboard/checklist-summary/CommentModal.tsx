@@ -5,7 +5,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
   DialogClose,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -17,16 +16,16 @@ import {
   useCommentTargetPostsQuery,
   ExtendedBlogPost,
 } from "@/remote/comments";
-import { useCurrentPeriodQuery } from "@/remote/period";
-import { AvailablePostCard } from "./AvailablePostCard";
+import { CommentablePost } from "./CommentablePost";
+import { usePeriodStore } from "../../../stores/usePeriodStore";
 
 export const CommentModal = () => {
-  const { data: currentPeriod } = useCurrentPeriodQuery();
+  const { period } = usePeriodStore();
   const { data: targetPosts = [] } = useCommentTargetPostsQuery(
-    currentPeriod?.id || ""
+    period?.id || ""
   ) as { data: ExtendedBlogPost[] };
   const { data: userCommentStatus } = useUserCommentStatusQuery(
-    currentPeriod?.id || ""
+    period?.id || ""
   );
 
   const { commentModalOpen, setCommentModalOpen } = useModalStore();
@@ -50,10 +49,6 @@ export const CommentModal = () => {
     }
     return acc;
   }, {} as Record<string, { total: number; commented: number }>);
-
-  const uniqueAuthorsCommented = Object.values(authorStats).filter(
-    (stat) => stat.commented > 0
-  ).length;
 
   const totalAuthors = Object.keys(authorStats).length;
 
@@ -112,7 +107,7 @@ export const CommentModal = () => {
                 </div>
               ) : (
                 targetPosts.map((post) => (
-                  <AvailablePostCard key={post.id} post={post} />
+                  <CommentablePost key={post.id} post={post} />
                 ))
               )}
             </div>

@@ -1,19 +1,16 @@
 "use client";
 
-import { useState } from "react";
-import { Card, CardContent } from "../ui/card";
-import {
-  useCalendarAttendanceQuery,
-  CalendarAttendanceData,
-} from "@/remote/calendar";
+import { Card, CardContent } from "../../ui/card";
+import { useCalendarAttendanceQuery } from "@/remote/calendar";
 import {
   formatDateForKey,
   formatDuration,
   getAttendanceColor,
   getCalendarDays,
 } from "@/utils/calendar";
-import { DashboardCalendarLegends } from "./calendar/DashboardCalendarLegends";
-import { DashboardCalendarSummary } from "./calendar/DashboardCalendarSummary";
+import { CalendarLegends } from "./CalendarLegends";
+import { CalendarSummary } from "./CalendarSummary";
+import { usePeriodStore } from "../../../stores/usePeriodStore";
 
 const MONTH_NAMES = [
   "1월",
@@ -32,23 +29,16 @@ const MONTH_NAMES = [
 
 const DAY_NAMES = ["일", "월", "화", "수", "목", "금", "토"];
 
-export function DashboardCalendar({ periodId }: { periodId: string }) {
-  const [currentDate] = useState(new Date());
-
-  const year = currentDate.getFullYear();
-  const month = currentDate.getMonth();
+export function AttendanceCalendar() {
+  const { period } = usePeriodStore();
 
   const {
     data: attendanceData,
     isLoading,
     error,
-  } = useCalendarAttendanceQuery(periodId);
+  } = useCalendarAttendanceQuery(period?.id || "");
 
-  const days = getCalendarDays(year, month);
-
-  // 실제 출석 데이터 또는 빈 객체
-  const actualAttendanceData: CalendarAttendanceData =
-    attendanceData?.attendance_data || {};
+  const days = getCalendarDays(period?.year || 0, period?.month || 0);
 
   // 로딩 중일 때
   if (isLoading) {
@@ -79,9 +69,9 @@ export function DashboardCalendar({ periodId }: { periodId: string }) {
       <CardContent className="p-4 h-full flex flex-col">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-medium text-diary-text">
-            {year}년 {MONTH_NAMES[month]}
+            {period?.year}년 {MONTH_NAMES[period?.month || 0]}
           </h3>
-          <DashboardCalendarLegends />
+          <CalendarLegends />
         </div>
 
         {/* 요일 헤더 */}
@@ -100,7 +90,7 @@ export function DashboardCalendar({ periodId }: { periodId: string }) {
         <div className="grid grid-cols-7 gap-1">
           {days.map((day, index) => {
             const dateKey = formatDateForKey(day.date);
-            const attendanceInfo = actualAttendanceData[dateKey];
+            const attendanceInfo = attendanceData?.attendance_data[dateKey];
             const isToday =
               day.date.toDateString() === new Date().toDateString();
 
@@ -159,7 +149,7 @@ export function DashboardCalendar({ periodId }: { periodId: string }) {
         </div>
 
         {/* 이번 달 출석 요약 */}
-        <DashboardCalendarSummary
+        <CalendarSummary
           totalAttendanceDays={attendanceData?.total_attendance_days || 0}
           avgMinutes={attendanceData?.avg_minutes || 0}
         />
