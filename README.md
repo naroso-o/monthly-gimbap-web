@@ -10,39 +10,39 @@
 
 매달 3가지 체크리스트를 완수하지 못하면 벌금을 내는 시스템으로 운영됩니다.
 
-## ✨ 주요 기능
+## ✨ 메뉴얼
 
-### 🔐 인증 시스템
+### 로그인
 
-- 관리자가 멤버 계정 생성
-- 멤버는 최초 로그인 후 비밀번호 변경 가능
-- 세션 기반 인증 (Supabase Auth)
+접속 초기화면입니다. 회원가입 후 로그인할 수 있습니다.
 
-### 📝 월별 체크리스트 (3가지)
+<img src="public/assets/signin.png" width="400px"/>
 
-#### 1. 블로그 글 작성
+### 회원가입
 
-- 월 1회 블로그 글 작성
-- GitHub Issue로 관리
-- 본인이 완료 체크
+폼을 완성하고 메일 인증을 시작합니다.
 
-#### 2. 수요일 출석
+<img src="public/assets/signup.png" width="400px"/>
 
-- 월 2회 이상 수요일 11PM-12AM 출석
-- 출석 시간 기록 (시작/종료 시간 선택)
-- 평소 출석도 기록 가능
+메일 인증을 하면 회원가입이 완료됩니다.
 
-#### 3. 댓글 활동
+<img src="public/assets/mail.png" width="400px"/>
 
-- 이전 달 포스팅 중 월 4명 이상에게 댓글 달기
-- (상호 확인을 할지, 댓글 단 포스트의 링크를 첨부할지 미정)
+### 메인 화면
 
-### 📊 통계 기능 (예정)
+로그인 후 메인 화면입니다. 스터디 관련 외부 링크로 바로 갈 수 있습니다.
 
-- 사용자별 월별 활동 시간
-- 요일별 출석 패턴
-- 시간대별 활동 분석
-- 체크리스트 완료 현황
+<img src="public/assets/entry.png" width="400px"/>
+
+### 체크리스트 기능
+
+블로그 제출뿐만 아니라, 출석 및 댓글을 확인합니다.
+
+<img src="public/assets/checklist.png" width="400px"/>
+
+<img src="public/assets/attendance.png" width="400px"/>
+
+<img src="public/assets/comments.png" width="400px"/>
 
 ## 🛠 기술 스택
 
@@ -104,32 +104,7 @@ code-kimbap/
 - `user_weekday_stats` - 요일별 통계
 - `monthly_checklist_status` - 체크리스트 현황
 
-## 🔧 주요 기능 설명
-
-### 인증 플로우
-
-1. 관리자가 계정 발급
-2. 사용자 계정 확인 후 비밀번호 설정
-
-### 체크리스트 관리
-
-1. 매월 자동으로 체크리스트 생성
-2. 사용자별 진행상황 추적
-3. 자동 완료 여부 계산
-4. 벌금 계산 시스템
-
 ## 📈 향후 계획
 
-- [ ] 모바일 앱 개발
-- [ ] 실시간 알림 시스템
-- [ ] 데이터 내보내기 기능
-- [ ] 관리자 대시보드 개선
-- [ ] 벌금 결제 시스템 연동
-
-## 🤝 기여하기
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+- [ ] 관리자 허용 회원가입
+- [ ] 벌금 시스템 연동
