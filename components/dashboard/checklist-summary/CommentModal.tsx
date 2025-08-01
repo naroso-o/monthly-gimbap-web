@@ -75,7 +75,7 @@ export const CommentModal = () => {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h4 className="text-sm font-medium text-diary-text">
-                  이번 달 블로그 글 목록
+                  저번 달 블로그 글 목록
                 </h4>
                 <Badge variant="outline" className="text-xs">
                   {targetPosts.length}개
