@@ -16,13 +16,9 @@ export interface MonthlyPeriod {
 /**
  * 현재 년월에 해당하는 기간 조회
  */
-export const useCurrentPeriodQuery = () => {
+export const usePeriodIdQuery = (year: number, month: number) => {
   const supabase = createClient();
-  const currentDate = new Date();
-  const currentYear = currentDate.getFullYear();
-  const currentMonth = currentDate.getMonth() + 1;
-  
-  const { queryKey } = queryKeys.period.current(currentYear, currentMonth);
+  const { queryKey } = queryKeys.period.current(year, month);
 
   return useQuery<MonthlyPeriod | null>({
     queryKey,
@@ -30,8 +26,8 @@ export const useCurrentPeriodQuery = () => {
       const { data, error } = await supabase
         .from('monthly_periods')
         .select('*')
-        .eq('year', currentYear)
-        .eq('month', currentMonth)
+        .eq('year', year)
+        .eq('month', month)
         .maybeSingle();
 
       if (error) throw error;

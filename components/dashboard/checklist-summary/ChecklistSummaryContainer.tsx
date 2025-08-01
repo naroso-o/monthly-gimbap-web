@@ -12,14 +12,14 @@ import { usePeriodStore } from "@/stores/usePeriodStore";
 import { PostModal } from "./PostModal";
 
 export function ChecklistSummaryContainer() {
-  const { period } = usePeriodStore();
+  const { period, previousId } = usePeriodStore();
 
+  const { data: blogPostCheck, isLoading: blogPostCheckLoading } =
+    useBlogPostCheckQuery(period?.id || "");
   const { data: attendanceChecklist, isLoading: attendanceChecklistLoading } =
     useAttendanceCheckQuery(period?.id || "");
   const { data: userCommentStatus, isLoading: userCommentStatusLoading } =
-    useUserCommentStatusQuery(period?.id || "");
-  const { data: blogPostCheck, isLoading: blogPostCheckLoading } =
-    useBlogPostCheckQuery(period?.id || "");
+    useUserCommentStatusQuery(previousId || "");
 
   const completedCount = [
     blogPostCheck?.is_completed,

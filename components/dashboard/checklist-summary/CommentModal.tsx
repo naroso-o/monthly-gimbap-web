@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MessageCircle, CheckCircle2, Circle } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import { useModalStore } from "@/stores/useModalStore";
 import {
   useUserCommentStatusQuery,
@@ -20,12 +20,13 @@ import { CommentablePost } from "./CommentablePost";
 import { usePeriodStore } from "../../../stores/usePeriodStore";
 
 export const CommentModal = () => {
-  const { period } = usePeriodStore();
+  const { previousId } = usePeriodStore();
+
   const { data: targetPosts = [] } = useCommentTargetPostsQuery(
-    period?.id || ""
+    previousId || ""
   ) as { data: ExtendedBlogPost[] };
   const { data: userCommentStatus } = useUserCommentStatusQuery(
-    period?.id || ""
+    previousId || ""
   );
 
   const { commentModalOpen, setCommentModalOpen } = useModalStore();
@@ -34,36 +35,19 @@ export const CommentModal = () => {
     setCommentModalOpen(false);
   };
 
-  // 작성자별 댓글 현황 계산
-  const authorStats = targetPosts.reduce((acc, post) => {
-    const authorName = post.author_name || "Unknown";
-    if (!acc[authorName]) {
-      acc[authorName] = {
-        total: 0,
-        commented: 0,
-      };
-    }
-    acc[authorName].total++;
-    if (post.has_commented) {
-      acc[authorName].commented++;
-    }
-    return acc;
-  }, {} as Record<string, { total: number; commented: number }>);
-
-  const totalAuthors = Object.keys(authorStats).length;
-
   return (
     <Dialog open={commentModalOpen} onOpenChange={setCommentModalOpen}>
-      <DialogContent className="max-w-2xl max-h-[80vh] bg-white">
+      <DialogContent className="max-w-4xl max-h-[90vh] bg-white flex flex-col">
         <DialogClose onClick={handleClose} />
-        <DialogHeader>
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle className="flex items-center gap-2">
             <MessageCircle className="w-5 h-5 text-diary-muted" />
             댓글 활동 체크
           </DialogTitle>
         </DialogHeader>
 
-        <div className="p-6 pt-0 space-y-4">
+        {/* 메인 콘텐츠 영역 */}
+        <div className="px-6 pb-6 space-y-6">
           {/* 통계 정보 */}
           <div className="grid grid-cols-3 gap-4 p-4 bg-diary-border/10 rounded-lg">
             <div className="text-center">
@@ -86,74 +70,37 @@ export const CommentModal = () => {
             </div>
           </div>
 
-          {/* 블로그 글 리스트 */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <h4 className="text-sm font-medium text-diary-text">
-                이번 달 블로그 글 목록
-              </h4>
-              <Badge variant="outline" className="text-xs">
-                {targetPosts.length}개
-              </Badge>
-            </div>
+          <div>
+            {/* 블로그 글 리스트 */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h4 className="text-sm font-medium text-diary-text">
+                  이번 달 블로그 글 목록
+                </h4>
+                <Badge variant="outline" className="text-xs">
+                  {targetPosts.length}개
+                </Badge>
+              </div>
 
-            <div className="max-h-96 overflow-y-auto space-y-2 border border-diary-border rounded-lg p-2">
               {targetPosts.length === 0 ? (
-                <div className="text-center py-8 text-diary-muted">
-                  <MessageCircle className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                <div className="text-center py-12 text-diary-muted">
+                  <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
                   <p className="text-sm">
                     아직 댓글을 달 수 있는 블로그 글이 없습니다.
                   </p>
                 </div>
               ) : (
-                targetPosts.map((post) => (
-                  <CommentablePost key={post.id} post={post} />
-                ))
+                <div className="grid grid-cols-2 gap-4">
+                  {targetPosts.map((post) => (
+                    <CommentablePost key={post.id} post={post} />
+                  ))}
+                </div>
               )}
             </div>
           </div>
 
-          {/* 작성자별 댓글 현황 */}
-          {totalAuthors > 0 && (
-            <div className="space-y-2">
-              <h4 className="text-sm font-medium text-diary-text">
-                작성자별 댓글 현황
-              </h4>
-              <div className="grid grid-cols-2 gap-2">
-                {Object.entries(authorStats).map(([authorName, stats]) => {
-                  const hasComment = stats.commented > 0;
-
-                  return (
-                    <div
-                      key={authorName}
-                      className={`flex items-center justify-between p-2 rounded-lg border ${
-                        hasComment
-                          ? "bg-green-50 border-green-200"
-                          : "bg-diary-card border-diary-border"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2">
-                        {hasComment ? (
-                          <CheckCircle2 className="w-4 h-4 text-green-600" />
-                        ) : (
-                          <Circle className="w-4 h-4 text-diary-muted" />
-                        )}
-                        <span className="text-sm font-medium text-diary-text">
-                          {authorName}
-                        </span>
-                      </div>
-                      <span className="text-xs text-diary-muted">
-                        {stats.commented}/{stats.total}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* 닫기 버튼 */}
-          <div className="flex justify-end pt-2">
+          {/* 확인 버튼 */}
+          <div className="flex justify-end pt-4">
             <Button onClick={handleClose} className="px-6">
               확인
             </Button>

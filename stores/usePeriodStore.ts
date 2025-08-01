@@ -11,10 +11,15 @@ interface Period {
 interface PeriodState {
   period: Period | null;
   setPeriod: (period: Period | null) => void;
+
+  previousId: string | null;
+  setPreviousId: (previousId: string | null) => void;
 }
 
 export const usePeriodStore = create<PeriodState>((set) => ({
   period: null,
-  setPeriod: (period: Period | null) =>
-    set({ period }),
+  setPeriod: (period: Period | null) => set({ period }),
+
+  previousId: null,
+  setPreviousId: (previousId) => set({ previousId }),
 }));

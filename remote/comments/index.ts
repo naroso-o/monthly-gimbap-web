@@ -60,10 +60,6 @@ export interface ChecklistComments {
   updated_at: string;
 }
 
-// ========================================
-// 2. React Query 훅들
-// ========================================
-
 export const useUserCommentStatusQuery = (periodId: string) => {
   const supabase = createClient();
 

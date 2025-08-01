@@ -35,12 +35,6 @@ export const CommentablePost = ({ post }: { post: ExtendedBlogPost }) => {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("ko-KR", {
-      month: "short",
-      day: "numeric",
-    });
-  };
   return (
     <div
       key={post.id}
@@ -50,7 +44,7 @@ export const CommentablePost = ({ post }: { post: ExtendedBlogPost }) => {
       <button
         onClick={() => handleCheckComment(post)}
         disabled={updatingPostId === post.id}
-        className="flex-shrink-0 p-1 hover:bg-diary-border/30 rounded transition-colors"
+        className="flex-shrink-0 p-1 cursor-pointer hover:bg-diary-border/30 rounded transition-colors"
       >
         {post.has_commented ? (
           <CheckCircle2 className="w-5 h-5 text-diary-accent" />
@@ -63,17 +57,11 @@ export const CommentablePost = ({ post }: { post: ExtendedBlogPost }) => {
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
           <span className="text-sm font-medium text-diary-text truncate">
-            PR {post.github_issue_url.split("/").pop() || "GitHub Issue"}
+            #{post.github_issue_url.split("/").pop() || "GitHub Issue"}
           </span>
           <Badge variant="secondary" className="text-xs flex-shrink-0">
             {user?.name || "Unknown"}
           </Badge>
-        </div>
-        <div className="flex items-center gap-2 text-xs text-diary-muted">
-          <span>{formatDate(post.submitted_at || "")}</span>
-          {post.has_commented && (
-            <span className="text-diary-accent">• 댓글 완료</span>
-          )}
         </div>
       </div>
 

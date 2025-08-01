@@ -7,8 +7,8 @@ import { usePeriodStore } from "../../../stores/usePeriodStore";
 
 export const CommentsCard = () => {
   const { setCommentModalOpen } = useModalStore();
-  const { period } = usePeriodStore();
-  const { data: userCommentStatus } = useUserCommentStatusQuery(period?.id || "");
+  const { previousId } = usePeriodStore();
+  const { data: userCommentStatus } = useUserCommentStatusQuery(previousId || "");
 
   return (
     <ChecklistCard
